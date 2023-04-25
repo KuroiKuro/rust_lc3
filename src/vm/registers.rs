@@ -25,6 +25,24 @@ pub enum RegisterName {
     Cond = 9,
 }
 
+impl From<u16> for RegisterName {
+    fn from(value: u16) -> Self {
+        match value {
+            0 => RegisterName::R0,
+            1 => RegisterName::R1,
+            2 => RegisterName::R2,
+            3 => RegisterName::R3,
+            4 => RegisterName::R4,
+            5 => RegisterName::R5,
+            6 => RegisterName::R6,
+            7 => RegisterName::R7,
+            8 => RegisterName::PC,
+            9 => RegisterName::Cond,
+            _ => panic!("Invalid register value ({})", value),
+        }
+    }
+}
+
 #[derive(Clone, Copy)]
 pub enum ConditionFlag {
     Pos = 0b001,
@@ -38,7 +56,7 @@ impl From<u16> for ConditionFlag {
             0b001 => ConditionFlag::Pos,
             0b010 => ConditionFlag::Zro,
             0b100 => ConditionFlag::Neg,
-            _ => panic!("Invalid value"),
+            _ => panic!("Invalid condition flag value ({})", value),
         }
     }
 }
