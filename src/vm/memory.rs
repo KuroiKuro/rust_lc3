@@ -5,11 +5,11 @@ const MEMORY_MAX: usize = 1 << 16;
 pub struct MemorySlice(u16);
 
 impl MemorySlice {
-    pub fn value(&self) -> u16 {
+    pub fn read(&self) -> u16 {
         self.0
     }
 
-    pub fn set_value(&mut self, value: u16) {
+    pub fn write(&mut self, value: u16) {
         self.0 = value;
     }
 }
@@ -24,27 +24,23 @@ impl Memory {
         Self {mem_arr}
     }
 
-    /// Gets the value at the given memory address
+    /// Reads the value at the given memory address
     /// 
     /// # Panics
     /// This method will panic if the given address is larger than the memory size
     /// configured in the constant `MEMORY_MAX`
-    pub fn get_mem_value(&self, address: usize) -> u16 {
-        if address > MEMORY_MAX {
-            panic!("Attempted to access invalid memory address: {}", address);
-        }
-        self.mem_arr[address].value()
+    pub fn read(&self, address: u16) -> u16 {
+        let address = address as usize;
+        self.mem_arr[address].read()
     }
 
-    /// Sets the value at the given memory address
+    /// Writes the value at the given memory address
     /// 
     /// # Panics
     /// This method will panic if the given address is larger than the memory size
     /// configured in the constant `MEMORY_MAX`
-    pub fn set_mem_value(&mut self, address: usize, value: u16) {
-        if address > MEMORY_MAX {
-            panic!("Attempted to write to invalid memory address: {}", address);
-        }
-        self.mem_arr[address].set_value(value);
+    pub fn write(&mut self, address: u16, value: u16) {
+        let address = address as usize;
+        self.mem_arr[address].write(value);
     }
 }
