@@ -1,7 +1,19 @@
 mod registers;
+mod memory;
 
-const MEMORY_MAX: usize = 1 << 16;
+use memory::Memory;
+use registers::Registers;
+
 
 pub struct Lc3Vm {
-    memory: [u16; MEMORY_MAX],
+    registers: Registers,
+    memory: Memory,
+}
+
+impl Lc3Vm {
+    pub fn new() -> Self {
+        let registers = Registers::new();
+        let memory = Memory::new();
+        Self { registers, memory }
+    }
 }
