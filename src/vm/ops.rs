@@ -1,4 +1,4 @@
-use std::cmp::Ordering;
+use std::num::Wrapping;
 
 use super::{registers::ConditionFlag, Lc3Vm};
 use crate::bitwise_utils::sign_extend;
@@ -10,14 +10,14 @@ impl Lc3Vm {
         // Use bitwise AND to retrieve only the bit that we are interested in
         let dest_reg = (instr >> 9) & 0b111;
         let first_reg = (instr >> 6) & 0b111;
-        let first_val: i16 = self.get_reg_val_by_id(first_reg).try_into().unwrap();
+        let first_val = self.get_reg_val_by_id(first_reg);
 
         // Check bit[5], if 0 then register mode else immediate mode
         let register_mode = ((instr >> 5) & 0b1) == 0;
-        let second_val: i16 = if register_mode {
+        let second_val = if register_mode {
             // Get the 2nd register for register mode
             let second_reg = instr & 0b111;
-            self.get_reg_val_by_id(second_reg).try_into().unwrap()
+            self.get_reg_val_by_id(second_reg)
         } else {
             let imm_val = instr & 0b11111;
             // Imm val is 5 bits, according to the spec
@@ -25,14 +25,23 @@ impl Lc3Vm {
             // imm_val
         };
 
-        let added = first_val + second_val;
-        self.set_reg_val_by_id(dest_reg, added.try_into().unwrap());
-        let cond_flag = match added.cmp(&0) {
-            Ordering::Equal => ConditionFlag::Zro,
-            Ordering::Greater => ConditionFlag::Pos,
-            Ordering::Less => ConditionFlag::Neg,
-        };
-        self.registers.set_cond_reg(cond_flag);
+        // Instead of using an i16, we use a u16 even though the numbers can
+        // be negative. This is to simulate working on the raw binary data
+        // instead of using Rust's datatype-related functionality.
+        // 
+        // It's possible that one or more of the u16s are negative, in which case
+        // the most significant bit will be `1`. Adding such a u16 to another one
+        // can result in an integer overflow, causing Rust to panic. However,
+        // in this case since we are not using the i16 datatype to do this
+        // arithmetic, the overflow is intended behaviour, and due to how the
+        // number is encoded with 2's complement, the resulting u16 will be
+        // the correct result
+        let wrapped_first = Wrapping(first_val);
+        let wrapped_second = Wrapping(second_val);
+        let added = wrapped_first + wrapped_second;
+        self.set_reg_val_by_id(dest_reg, added.0);
+        let flag = ConditionFlag::parse_u16(added.0);
+        self.registers.set_cond_reg(flag);
     }
 
     fn ldi_op(&mut self, instr: u16) {
