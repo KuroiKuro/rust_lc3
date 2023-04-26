@@ -9,23 +9,23 @@ use registers::Registers;
 
 use self::registers::{ConditionFlag, RegisterName};
 
-const DEFAULT_PC_START: u16 = 0x3000;
-
 pub struct Lc3Vm {
     registers: Registers,
     memory: Memory,
 }
 
 impl Lc3Vm {
+    const DEFAULT_PC_START: u16 = 0x3000;
+
     pub fn new() -> Self {
         let registers = Registers::new();
         let memory = Memory::new();
-        Self { registers, memory }
+        let mut vm = Self { registers, memory };
+        vm.registers.set_program_counter(Self::DEFAULT_PC_START);
+        vm
     }
 
     pub fn run(&mut self) {
-        self.registers.set_program_counter(DEFAULT_PC_START);
-
         loop {
             let instr = self.memory.read(self.registers.program_counter());
             self.registers.increment_program_counter();
