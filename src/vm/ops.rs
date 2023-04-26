@@ -34,6 +34,28 @@ impl Lc3Vm {
         };
         self.registers.set_cond_reg(cond_flag);
     }
+
+    fn ldi_op(&mut self, instr: u16) {
+        let dest_reg = (instr >> 9) & 0b111;
+        // After doing &, it is already automatically sign extended by Rust's u16 type
+        let pc_offset = instr & 0b111111111;
+        let current_pc = self.registers.program_counter();
+        let address = pc_offset + current_pc;
+        let value = self.memory.read(address);
+        self.set_reg_val_by_id(dest_reg, value);
+        // Check if value is positive or negative to set the flags
+        let flag = if value == 0 {
+            ConditionFlag::Zro
+        } else {
+            let most_sig_bit = value >> 15;
+            if most_sig_bit == 0 {
+                ConditionFlag::Pos
+            } else {
+                ConditionFlag::Neg
+            }
+        };
+        self.registers.set_cond_reg(flag);
+    }
 }
 
 #[cfg(test)]
