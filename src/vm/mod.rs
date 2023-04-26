@@ -91,3 +91,25 @@ fn add_op(instr: u16, vm: &mut Lc3Vm) {
     };
     vm.registers.set_cond_reg(cond_flag);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[allow(clippy::unusual_byte_groupings)]
+    fn test_add_op() {
+        let mut vm = Lc3Vm::new();
+        // ADD R2, R3, R4
+        let instr: u16 = 0b0001_001_010_000_011;
+
+        // Setup data in registers
+        let first = 5;
+        let second = 3;
+        vm.set_reg_val_by_id(2, first);
+        vm.set_reg_val_by_id(3, second);
+        add_op(instr, &mut vm);
+        let added_val = vm.get_reg_val_by_id(1);
+        assert_eq!(added_val, first + second);
+    }
+}
