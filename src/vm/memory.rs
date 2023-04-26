@@ -15,17 +15,17 @@ impl MemorySlice {
 }
 
 pub struct Memory {
-    mem_arr: [MemorySlice; MEMORY_MAX]
+    mem_arr: [MemorySlice; MEMORY_MAX],
 }
 
 impl Memory {
     pub fn new() -> Self {
         let mem_arr: [MemorySlice; MEMORY_MAX] = [MemorySlice(0); MEMORY_MAX];
-        Self {mem_arr}
+        Self { mem_arr }
     }
 
     /// Reads the value at the given memory address
-    /// 
+    ///
     /// # Panics
     /// This method will panic if the given address is larger than the memory size
     /// configured in the constant `MEMORY_MAX`
@@ -35,7 +35,7 @@ impl Memory {
     }
 
     /// Writes the value at the given memory address
-    /// 
+    ///
     /// # Panics
     /// This method will panic if the given address is larger than the memory size
     /// configured in the constant `MEMORY_MAX`

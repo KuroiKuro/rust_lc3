@@ -1,13 +1,13 @@
-mod registers;
 mod memory;
 mod ops;
+mod registers;
 
 use std::cmp::Ordering;
 
 use memory::Memory;
 use registers::Registers;
 
-use self::registers::{RegisterName, ConditionFlag};
+use self::registers::{ConditionFlag, RegisterName};
 
 const DEFAULT_PC_START: u16 = 0x3000;
 
@@ -31,7 +31,6 @@ impl Lc3Vm {
             self.registers.increment_program_counter();
             // First 4 bits of an instruction are the opcodes
             let opcode = instr >> 12;
-
         }
     }
 

@@ -1,5 +1,5 @@
-mod vm;
 mod bitwise_utils;
+mod vm;
 
 use vm::Lc3Vm;
 

@@ -72,15 +72,20 @@ pub struct Registers {
     program_counter_reg: Register,
     /// Condition register stores condition flags about most recently executed calcs.
     /// This allows comparisons, etc
-    condition_reg: Register
+    condition_reg: Register,
 }
 
 impl Registers {
     pub fn new() -> Self {
-        let general_regs: [Register; GENERAL_REGISTER_COUNT] = [Register(0); GENERAL_REGISTER_COUNT];
+        let general_regs: [Register; GENERAL_REGISTER_COUNT] =
+            [Register(0); GENERAL_REGISTER_COUNT];
         let program_counter_reg = Register(0);
         let condition_reg = Register(0);
-        Self {general_regs, program_counter_reg, condition_reg}
+        Self {
+            general_regs,
+            program_counter_reg,
+            condition_reg,
+        }
     }
 
     pub fn get_reg_value(&self, register: RegisterName) -> u16 {
@@ -112,5 +117,5 @@ impl Registers {
 
     pub fn set_cond_reg(&mut self, flag: ConditionFlag) {
         self.condition_reg.set(flag.into());
-    } 
+    }
 }

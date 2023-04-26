@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
+use super::{registers::ConditionFlag, Lc3Vm};
 use crate::bitwise_utils::sign_extend;
-use super::{Lc3Vm, registers::ConditionFlag};
 
 // https://www.jmeiners.com/lc3-vm/supplies/lc3-isa.pdf
 impl Lc3Vm {
@@ -10,10 +10,8 @@ impl Lc3Vm {
         // Use bitwise AND to retrieve only the bit that we are interested in
         let dest_reg = (instr >> 9) & 0b111;
         let first_reg = (instr >> 6) & 0b111;
-        let first_val: i16 = self.get_reg_val_by_id(first_reg)
-            .try_into()
-            .unwrap();
-    
+        let first_val: i16 = self.get_reg_val_by_id(first_reg).try_into().unwrap();
+
         // Check bit[5], if 0 then register mode else immediate mode
         let register_mode = ((instr >> 5) & 0b1) == 0;
         let second_val: i16 = if register_mode {
@@ -26,7 +24,7 @@ impl Lc3Vm {
             sign_extend(imm_val, 5)
             // imm_val
         };
-    
+
         let added = first_val + second_val;
         self.set_reg_val_by_id(dest_reg, added.try_into().unwrap());
         let cond_flag = match added.cmp(&0) {
