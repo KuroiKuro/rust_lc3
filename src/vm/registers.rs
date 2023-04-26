@@ -102,9 +102,10 @@ impl Registers {
         self.program_counter_reg.value()
     }
 
-    pub fn increment_program_counter(&mut self) {
-        let current_val = self.program_counter_reg.value() + 1;
-        self.program_counter_reg.set(current_val);
+    pub fn increment_program_counter(&mut self) -> u16 {
+        let new_pc_val = self.program_counter_reg.value() + 1;
+        self.program_counter_reg.set(new_pc_val);
+        new_pc_val
     }
 
     pub fn set_program_counter(&mut self, value: u16) {
