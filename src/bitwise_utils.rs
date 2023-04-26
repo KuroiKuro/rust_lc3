@@ -1,6 +1,7 @@
-/// Sign extension of numbers, when the number is smaller than 16 bits
-/// TODO: Research https://en.wikipedia.org/wiki/Two%27s_complement
+/// Sign extension of numbers, when the number is smaller than 16 bits. This function
+/// returns an `i16`, which will allow sign extension of negative values
 pub fn sign_extend(x: u16, bit_count: u16) -> i16 {
+    // TODO: Research https://en.wikipedia.org/wiki/Two%27s_complement
     let mut x_arg: i16 = x.try_into().unwrap();
 
     // Check if the most significant bit is a 1. If it is then fill in 1s for the
