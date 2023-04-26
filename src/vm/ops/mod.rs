@@ -68,6 +68,34 @@ impl Lc3Vm {
         self.registers.set_cond_reg(flag);
     }
 
+    /// Performs the `BR` operation, include the `znp` variants
+    fn br_op(&mut self, instr: u16) {
+        let flag_bits: u16 = instr >> 9;
+        let test_neg = ((flag_bits >> 2) & 1) == 1;
+        let test_zro = ((flag_bits >> 1) & 1) == 1;
+        let test_pos = (flag_bits & 1) == 1;
+
+        let offset = instr & 0b111111111;
+        let current_pc = self.registers.program_counter();
+        let br_address = offset + current_pc;
+        
+        let flag = self.get_cond_flag();
+        let will_br = match (test_neg, test_zro, test_pos) {
+            (true, true, true) => true,
+            (true, false, false) => flag == ConditionFlag::Neg,
+            (true, true, false) => flag == ConditionFlag::Neg || flag == ConditionFlag::Zro,
+            (false, false, true) => flag == ConditionFlag::Pos,
+            (false, true, true) => flag == ConditionFlag::Pos || flag == ConditionFlag::Zro,
+            (false, true, false) => flag == ConditionFlag::Zro,
+            (true, false, true) => flag == ConditionFlag::Neg || flag == ConditionFlag::Pos,
+            (false, false, false) => false
+        };
+
+        if will_br {
+            self.registers.set_program_counter(br_address);
+        }
+    }
+
     /// Performs the `LDI` operation
     fn ldi_op(&mut self, instr: u16) {
         let dest_reg = (instr >> 9) & 0b111;
