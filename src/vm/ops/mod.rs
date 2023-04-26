@@ -96,6 +96,13 @@ impl Lc3Vm {
         }
     }
 
+    /// Implements the `JMP` op
+    fn jmp_op(&mut self, instr: u16) {
+        let base_reg = (instr >> 6) & 0b111;
+        let base_reg_val = self.get_reg_val_by_id(base_reg);
+        self.registers.set_program_counter(base_reg_val);
+    }
+
     /// Performs the `LDI` operation
     fn ldi_op(&mut self, instr: u16) {
         let dest_reg = (instr >> 9) & 0b111;

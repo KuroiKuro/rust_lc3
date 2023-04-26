@@ -47,7 +47,7 @@ fn test_ldi_op() {
     let data: u16 = 1234;
     let desired_address: u16 = 0x3050;
     // let offset = desired_address - Lc3Vm::DEFAULT_PC_START;
-    // LDI R3, ${offset}
+    // LDI R2, ${offset}
     let instr: u16 = 0b1010_010_001010000;
 
     let mut vm = Lc3Vm::new();
@@ -63,7 +63,7 @@ fn test_ldi_op() {
 #[test]
 #[allow(clippy::unusual_byte_groupings)]
 fn test_and_op_register_mode() {
-    // AND R3, R5, R4
+    // AND R2, R4, R3
     let instr: u16 = 0b0101_010_100_0_00_011;
     let val1: u16 = 3433;
     let val2: u16 = 128;
@@ -274,4 +274,18 @@ fn test_br_op_no_set() {
     vm.br_op(instr);
     let current_pc = vm.registers.program_counter();
     assert_ne!(current_pc, desired_address);
+}
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_jmp_ret_op() {
+    let mut vm = Lc3Vm::new();
+    // RET is a special form of JMP, which is the equivalent of:
+    // JMP R7
+    let instr: u16 = 0b1100_000_111_000000;
+    let value = 0x3085;
+    vm.set_reg_val_by_id(7, value);
+    vm.jmp_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, value);
 }
