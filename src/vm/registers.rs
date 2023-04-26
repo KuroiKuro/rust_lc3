@@ -50,6 +50,27 @@ pub enum ConditionFlag {
     Neg = 0b100,
 }
 
+impl ConditionFlag {
+    /// Given a `u16` value, determine what is the flag that will be set.
+    /// 
+    /// If the value equals to `0`, then the flag will be `Zro`. Otherwise,
+    /// inspect the most significant bit. If the most significant bit is `1`, then
+    /// the number is a negative value and the flag will be `Neg`, otherwise it will
+    /// be `Pos`
+    pub fn parse_u16(value: u16) -> ConditionFlag {
+        if value == 0 {
+            ConditionFlag::Zro
+        } else {
+            let most_sig_bit = value >> 15;
+            if most_sig_bit == 0 {
+                ConditionFlag::Pos
+            } else {
+                ConditionFlag::Neg
+            }
+        }
+    }
+}
+
 impl From<u16> for ConditionFlag {
     fn from(value: u16) -> Self {
         match value {

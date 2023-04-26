@@ -44,16 +44,7 @@ impl Lc3Vm {
         let value = self.memory.read(address);
         self.set_reg_val_by_id(dest_reg, value);
         // Check if value is positive or negative to set the flags
-        let flag = if value == 0 {
-            ConditionFlag::Zro
-        } else {
-            let most_sig_bit = value >> 15;
-            if most_sig_bit == 0 {
-                ConditionFlag::Pos
-            } else {
-                ConditionFlag::Neg
-            }
-        };
+        let flag = ConditionFlag::parse_u16(value);
         self.registers.set_cond_reg(flag);
     }
 }
