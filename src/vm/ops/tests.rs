@@ -78,3 +78,200 @@ fn test_and_op_register_mode() {
     let flag = ConditionFlag::parse_u16(result);
     assert_eq!(flag, ConditionFlag::Zro);
 }
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_br_op_n() {
+    let desired_address: u16 = 0x3050;
+    let instr: u16 = 0b0000_100_001010000;
+
+    let mut vm = Lc3Vm::new();
+    vm.registers.set_cond_reg(ConditionFlag::Zro);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_ne!(current_pc, desired_address);
+
+    vm.registers.set_cond_reg(ConditionFlag::Pos);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_ne!(current_pc, desired_address);
+
+    vm.registers.set_cond_reg(ConditionFlag::Neg);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+}
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_br_op_z() {
+    let desired_address: u16 = 0x3050;
+    let instr: u16 = 0b0000_010_001010000;
+
+    let mut vm = Lc3Vm::new();
+    vm.registers.set_cond_reg(ConditionFlag::Neg);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_ne!(current_pc, desired_address);
+
+    vm.registers.set_cond_reg(ConditionFlag::Pos);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_ne!(current_pc, desired_address);
+
+    vm.registers.set_cond_reg(ConditionFlag::Zro);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+}
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_br_op_p() {
+    let desired_address: u16 = 0x3050;
+    let instr: u16 = 0b0000_001_001010000;
+
+    let mut vm = Lc3Vm::new();
+    vm.registers.set_cond_reg(ConditionFlag::Neg);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_ne!(current_pc, desired_address);
+
+    vm.registers.set_cond_reg(ConditionFlag::Zro);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_ne!(current_pc, desired_address);
+
+    vm.registers.set_cond_reg(ConditionFlag::Pos);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+}
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_br_op_nz() {
+    let desired_address: u16 = 0x3050;
+    let instr: u16 = 0b0000_110_001010000;
+
+    let mut vm = Lc3Vm::new();
+
+    vm.registers.set_cond_reg(ConditionFlag::Pos);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_ne!(current_pc, desired_address);
+
+    vm.registers.set_cond_reg(ConditionFlag::Neg);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+    vm.registers.set_program_counter(Lc3Vm::DEFAULT_PC_START);
+
+    vm.registers.set_cond_reg(ConditionFlag::Zro);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+}
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_br_op_zp() {
+    let desired_address: u16 = 0x3050;
+    let instr: u16 = 0b0000_011_001010000;
+
+    let mut vm = Lc3Vm::new();
+
+    vm.registers.set_cond_reg(ConditionFlag::Neg);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_ne!(current_pc, desired_address);
+
+    vm.registers.set_cond_reg(ConditionFlag::Pos);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+    vm.registers.set_program_counter(Lc3Vm::DEFAULT_PC_START);
+
+    vm.registers.set_cond_reg(ConditionFlag::Zro);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+}
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_br_op_np() {
+    // Note: Not sure if this combo will ever happen irl but it is implemented anyway
+    let desired_address: u16 = 0x3050;
+    let instr: u16 = 0b0000_101_001010000;
+
+    let mut vm = Lc3Vm::new();
+
+    vm.registers.set_cond_reg(ConditionFlag::Zro);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_ne!(current_pc, desired_address);
+
+    vm.registers.set_cond_reg(ConditionFlag::Pos);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+    vm.registers.set_program_counter(Lc3Vm::DEFAULT_PC_START);
+
+    vm.registers.set_cond_reg(ConditionFlag::Neg);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+}
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_br_op_nzp() {
+    // Note: Not sure if this combo will ever happen irl but it is implemented anyway
+    let desired_address: u16 = 0x3050;
+    let instr: u16 = 0b0000_111_001010000;
+
+    let mut vm = Lc3Vm::new();
+
+    vm.registers.set_cond_reg(ConditionFlag::Zro);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+    vm.registers.set_program_counter(Lc3Vm::DEFAULT_PC_START);
+
+    vm.registers.set_cond_reg(ConditionFlag::Pos);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+    vm.registers.set_program_counter(Lc3Vm::DEFAULT_PC_START);
+
+    vm.registers.set_cond_reg(ConditionFlag::Neg);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+}
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_br_op_no_set() {
+    // Note: Not sure if this combo will ever happen irl but it is implemented anyway
+    let desired_address: u16 = 0x3050;
+    let instr: u16 = 0b0000_000_001010000;
+
+    let mut vm = Lc3Vm::new();
+
+    vm.registers.set_cond_reg(ConditionFlag::Zro);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_ne!(current_pc, desired_address);
+
+    vm.registers.set_cond_reg(ConditionFlag::Pos);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_ne!(current_pc, desired_address);
+
+    vm.registers.set_cond_reg(ConditionFlag::Neg);
+    vm.br_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_ne!(current_pc, desired_address);
+}
