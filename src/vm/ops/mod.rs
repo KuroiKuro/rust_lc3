@@ -12,15 +12,15 @@ impl Lc3Vm {
     fn add_op(&mut self, instr: u16) {
         // Use bitwise AND to retrieve only the bit that we are interested in
         let dest_reg = (instr >> 9) & 0b111;
-        let first_reg = (instr >> 6) & 0b111;
-        let first_val = self.get_reg_val_by_id(first_reg);
+        let sr1 = (instr >> 6) & 0b111;
+        let first_val = self.get_reg_val_by_id(sr1);
 
         // Check bit[5], if 0 then register mode else immediate mode
         let register_mode = ((instr >> 5) & 0b1) == 0;
         let second_val = if register_mode {
             // Get the 2nd register for register mode
-            let second_reg = instr & 0b111;
-            self.get_reg_val_by_id(second_reg)
+            let sr2 = instr & 0b111;
+            self.get_reg_val_by_id(sr2)
         } else {
             let imm_val = instr & 0b11111;
             // Imm val is 5 bits, according to the spec
@@ -47,6 +47,28 @@ impl Lc3Vm {
         self.registers.set_cond_reg(flag);
     }
 
+    /// Performs the `AND` operation
+    fn and_op(&mut self, instr: u16) {
+        let dest_reg = (instr >> 9) & 0b111;
+        let sr1 = (instr >> 6) & 0b111;
+        let val1 = self.get_reg_val_by_id(sr1);
+
+        let register_mode = (instr >> 5) & 1 == 0;
+        let val2 = if register_mode {
+            let sr2 = instr & 0b111;
+            self.get_reg_val_by_id(sr2)
+        } else {
+            let imm_val = instr & 0b11111;
+            sign_extend(imm_val, 5)
+        };
+
+        let result = val1 & val2;
+        self.set_reg_val_by_id(dest_reg, result);
+        let flag = ConditionFlag::parse_u16(result);
+        self.registers.set_cond_reg(flag);
+    }
+
+    /// Performs the `LDI` operation
     fn ldi_op(&mut self, instr: u16) {
         let dest_reg = (instr >> 9) & 0b111;
         // After doing &, it is already automatically sign extended by Rust's u16 type

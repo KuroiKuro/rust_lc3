@@ -59,3 +59,22 @@ fn test_ldi_op() {
     let flag = vm.get_cond_flag();
     assert_eq!(flag, ConditionFlag::Pos);
 }
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_and_op_register_mode() {
+    // AND R3, R5, R4
+    let instr: u16 = 0b0101_010_100_0_00_011;
+    let val1: u16 = 3433;
+    let val2: u16 = 128;
+
+    let mut vm = Lc3Vm::new();
+    vm.set_reg_val_by_id(4, val1);
+    vm.set_reg_val_by_id(3, val2);
+
+    vm.and_op(instr);
+    let result = vm.get_reg_val_by_id(2);
+    assert_eq!(result, val1 & val2);
+    let flag = ConditionFlag::parse_u16(result);
+    assert_eq!(flag, ConditionFlag::Zro);
+}
