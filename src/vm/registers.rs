@@ -43,7 +43,7 @@ impl From<u16> for RegisterName {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum ConditionFlag {
     Pos = 0b001,
     Zro = 0b010,

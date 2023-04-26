@@ -29,12 +29,16 @@ fn test_add_op_imm_mode() {
     vm.add_op(instr);
     let added_val = vm.get_reg_val_by_id(0);
     assert_eq!(added_val, val);
+    let flag = vm.get_cond_flag();
+    assert_eq!(flag, ConditionFlag::Pos);
 
-    // ADD R1, R0, -1
-    let instr: u16 = 0b0001_001_000_1_11111;
+    // ADD R1, R0, -5
+    let instr: u16 = 0b0001_001_000_1_11011;
     vm.add_op(instr);
     let added_val = vm.get_reg_val_by_id(1);
-    assert_eq!(added_val, 3 - 1);
+    assert_eq!(added_val, 0b1111_1111_1111_1110);
+    let flag = vm.get_cond_flag();
+    assert_eq!(flag, ConditionFlag::Neg);
 }
 
 #[test]
@@ -42,7 +46,7 @@ fn test_add_op_imm_mode() {
 fn test_ldi_op() {
     let data: u16 = 1234;
     let desired_address: u16 = 0x3050;
-    let offset = desired_address - Lc3Vm::DEFAULT_PC_START;
+    // let offset = desired_address - Lc3Vm::DEFAULT_PC_START;
     // LDI R3, ${offset}
     let instr: u16 = 0b1010_010_001010000;
 
@@ -51,4 +55,7 @@ fn test_ldi_op() {
     vm.ldi_op(instr);
     let reg_val = vm.get_reg_val_by_id(2);
     assert_eq!(reg_val, data);
+    // Test flag
+    let flag = vm.get_cond_flag();
+    assert_eq!(flag, ConditionFlag::Pos);
 }

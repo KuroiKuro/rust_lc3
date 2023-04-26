@@ -47,4 +47,9 @@ impl Lc3Vm {
         let register = RegisterName::from(reg_id);
         self.registers.set_reg_value(register, value);
     }
+
+    pub fn get_cond_flag(&self) -> ConditionFlag {
+        let flag_reg_val = self.registers.cond_reg();
+        ConditionFlag::from(flag_reg_val)
+    }
 }
