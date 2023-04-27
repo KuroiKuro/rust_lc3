@@ -149,6 +149,16 @@ impl Lc3Vm {
 
     /// Performs the `LDR` operation
     fn ldr_op(&mut self, instr: u16) {
+        let offset = instr & 0x3F;
+        let offset = Wrapping(sign_extend(offset, 6));
+        let base_reg = (instr >> 6) & 0x7;
+        let dest_reg = (instr >> 9) & 0x7;
 
+        let br_val = Wrapping(self.get_reg_val_by_id(base_reg));
+        let address = br_val + offset;
+        let value = self.memory.read(address.0);
+        self.set_reg_val_by_id(dest_reg, value);
+        let flag = ConditionFlag::parse_u16(value);
+        self.registers.set_cond_reg(flag);
     }
 }

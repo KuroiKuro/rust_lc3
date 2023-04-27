@@ -75,8 +75,9 @@ fn test_and_op_register_mode() {
     vm.and_op(instr);
     let result = vm.get_reg_val_by_id(2);
     assert_eq!(result, val1 & val2);
-    let flag = ConditionFlag::parse_u16(result);
-    assert_eq!(flag, ConditionFlag::Zro);
+    let flag = ConditionFlag::from(vm.registers.cond_reg());
+    let correct_flag: ConditionFlag = ConditionFlag::parse_u16(result);
+    assert_eq!(flag, correct_flag);
 }
 
 #[test]
@@ -329,6 +330,27 @@ fn test_ld_op() {
     vm.ld_op(instr);
     let value = vm.get_reg_val_by_id(4);
     assert_eq!(value, stored_value);
-    let flag = ConditionFlag::parse_u16(value);
-    assert_eq!(flag, ConditionFlag::Neg);
+    let flag = ConditionFlag::from(vm.registers.cond_reg());
+    let correct_flag: ConditionFlag = ConditionFlag::parse_u16(value);
+    assert_eq!(flag, correct_flag);
+}
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_ldr_op() {
+    let mut vm = Lc3Vm::new();
+    let desired_address = 0x4100;
+    let br_val: u16 = 0x40FC;
+    let stored_value = 9913;
+    vm.memory.write(desired_address, stored_value);
+
+    // LDR R4, R2, offset
+    let instr: u16 = 0b0110_100_010_000100;
+    vm.set_reg_val_by_id(2, br_val);
+    vm.ldr_op(instr);
+    let value = vm.get_reg_val_by_id(4);
+    assert_eq!(value, stored_value);
+    let flag = ConditionFlag::from(vm.registers.cond_reg());
+    let correct_flag: ConditionFlag = ConditionFlag::parse_u16(value);
+    assert_eq!(flag, correct_flag);
 }
