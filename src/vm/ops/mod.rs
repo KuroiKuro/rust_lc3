@@ -139,8 +139,9 @@ impl Lc3Vm {
         // After doing &, it is already automatically sign extended by Rust's u16 type
         let pc_offset = sign_extend(instr & 0x1ff, 9);
         let current_pc = self.registers.program_counter();
-        let address = pc_offset + current_pc;
-        let value = self.memory.read(address);
+        let pointer_address = pc_offset + current_pc;
+        let final_address = self.memory.read(pointer_address);
+        let value = self.memory.read(final_address);
         self.set_reg_val_by_id(dest_reg, value);
         // Check if value is positive or negative to set the flags
         let flag = ConditionFlag::parse_u16(value);

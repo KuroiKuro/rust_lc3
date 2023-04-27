@@ -45,13 +45,15 @@ fn test_add_op_imm_mode() {
 #[allow(clippy::unusual_byte_groupings)]
 fn test_ldi_op() {
     let data: u16 = 1234;
-    let desired_address: u16 = 0x3050;
+    let final_address: u16 = 0x3085;
+    let pointer_address: u16 = 0x3050;
     // let offset = desired_address - Lc3Vm::DEFAULT_PC_START;
     // LDI R2, ${offset}
     let instr: u16 = 0b1010_010_001010000;
 
     let mut vm = Lc3Vm::new();
-    vm.memory.write(desired_address, data);
+    vm.memory.write(pointer_address, final_address);
+    vm.memory.write(final_address, data);
     vm.ldi_op(instr);
     let reg_val = vm.get_reg_val_by_id(2);
     assert_eq!(reg_val, data);
