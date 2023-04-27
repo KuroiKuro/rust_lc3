@@ -174,4 +174,15 @@ impl Lc3Vm {
         let flag = ConditionFlag::parse_u16(value);
         self.registers.set_cond_reg(flag);
     }
+
+    /// Performs the `NOT` operation
+    fn not_op(&mut self, instr: u16) {
+        let sr = (instr >> 6) & 0x7;
+        let dr = (instr >> 9) & 0x7;
+        let sr_val = self.get_reg_val_by_id(sr);
+        let value = !sr_val;
+        self.set_reg_val_by_id(dr, value);
+        let flag = ConditionFlag::parse_u16(value);
+        self.registers.set_cond_reg(flag);
+    }
 }

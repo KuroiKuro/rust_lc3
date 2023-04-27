@@ -375,3 +375,16 @@ fn test_lea_op() {
     let flag = vm.get_cond_flag();
     assert_eq!(flag, ConditionFlag::Pos);
 }
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_not_op() {
+    let mut vm = Lc3Vm::new();
+    // NOT R4, R2
+    let instr: u16 = 0b1001_100_010_1_11111;
+    let num = 1413;
+    vm.set_reg_val_by_id(2, num);
+    vm.not_op(instr);
+    let value = vm.get_reg_val_by_id(4);
+    assert_eq!(value, !num);
+}
