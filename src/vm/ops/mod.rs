@@ -112,7 +112,7 @@ impl Lc3Vm {
         // Implement both the JSR and JSRR operation
         let jsr_mode = ((instr >> 11) & 1) == 1;
         let new_pc_addr = if jsr_mode {
-            let offset = instr & 0b11111111111;
+            let offset = sign_extend(instr & 0x7ff, 11);
             current_pc + offset
         } else {
             let base_reg = (instr >> 8) & 0b111;
@@ -123,7 +123,7 @@ impl Lc3Vm {
 
     /// Performs the `LD` operation
     fn ld_op(&mut self, instr: u16) {
-        let offset = instr & 0x1ff;
+        let offset = sign_extend(instr & 0x1ff, 9);
         let dest_reg = (instr >> 9) & 0x7;
         let current_pc = self.registers.program_counter();
         let load_addr = current_pc + offset;
@@ -137,7 +137,7 @@ impl Lc3Vm {
     fn ldi_op(&mut self, instr: u16) {
         let dest_reg = (instr >> 9) & 0b111;
         // After doing &, it is already automatically sign extended by Rust's u16 type
-        let pc_offset = instr & 0b111111111;
+        let pc_offset = sign_extend(instr & 0x1ff, 9);
         let current_pc = self.registers.program_counter();
         let address = pc_offset + current_pc;
         let value = self.memory.read(address);
@@ -145,5 +145,10 @@ impl Lc3Vm {
         // Check if value is positive or negative to set the flags
         let flag = ConditionFlag::parse_u16(value);
         self.registers.set_cond_reg(flag);
+    }
+
+    /// Performs the `LDR` operation
+    fn ldr_op(&mut self, instr: u16) {
+
     }
 }
