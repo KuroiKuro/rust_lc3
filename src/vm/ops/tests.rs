@@ -324,10 +324,11 @@ fn test_ld_op() {
     // LD R4, VALUE
     let instr: u16 = 0b0010_100_010000101;
 
-    let stored_value = 2128;
+    let stored_value = 0xF1FA;
     vm.memory.write(desired_address, stored_value);
     vm.ld_op(instr);
     let value = vm.get_reg_val_by_id(4);
     assert_eq!(value, stored_value);
-
+    let flag = ConditionFlag::parse_u16(value);
+    assert_eq!(flag, ConditionFlag::Neg);
 }
