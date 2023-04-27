@@ -289,3 +289,29 @@ fn test_jmp_ret_op() {
     let current_pc = vm.registers.program_counter();
     assert_eq!(current_pc, value);
 }
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_jsr_op() {
+    let mut vm = Lc3Vm::new();
+    let desired_address = 0x3085;
+    let instr: u16 = 0b0100_1_00010000101;
+
+    vm.jsr_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+}
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_jsrr_op() {
+    let mut vm = Lc3Vm::new();
+    let desired_address = 0x3085;
+    // JSRR R3
+    let instr: u16 = 0b0100_0_011_00000000;
+
+    vm.set_reg_val_by_id(3, desired_address);
+    vm.jsr_op(instr);
+    let current_pc = vm.registers.program_counter();
+    assert_eq!(current_pc, desired_address);
+}
