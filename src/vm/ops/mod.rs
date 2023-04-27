@@ -121,6 +121,18 @@ impl Lc3Vm {
         self.registers.set_program_counter(new_pc_addr);
     } 
 
+    /// Performs the `LD` operation
+    fn ld_op(&mut self, instr: u16) {
+        let offset = instr & 0x1ff;
+        let dest_reg = (instr >> 9) & 0x7;
+        let current_pc = self.registers.program_counter();
+        let load_addr = current_pc + offset;
+        let value = self.memory.read(load_addr);
+        self.set_reg_val_by_id(dest_reg, value);
+        let flag = ConditionFlag::parse_u16(value);
+        self.registers.set_cond_reg(flag);
+    }
+
     /// Performs the `LDI` operation
     fn ldi_op(&mut self, instr: u16) {
         let dest_reg = (instr >> 9) & 0b111;

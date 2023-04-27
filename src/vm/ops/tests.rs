@@ -315,3 +315,19 @@ fn test_jsrr_op() {
     let current_pc = vm.registers.program_counter();
     assert_eq!(current_pc, desired_address);
 }
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_ld_op() {
+    let mut vm = Lc3Vm::new();
+    let desired_address = 0x3085;
+    // LD R4, VALUE
+    let instr: u16 = 0b0010_100_010000101;
+
+    let stored_value = 2128;
+    vm.memory.write(desired_address, stored_value);
+    vm.ld_op(instr);
+    let value = vm.get_reg_val_by_id(4);
+    assert_eq!(value, stored_value);
+
+}
