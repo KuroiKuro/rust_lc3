@@ -136,7 +136,6 @@ impl Lc3Vm {
     /// Performs the `LDI` operation
     fn ldi_op(&mut self, instr: u16) {
         let dest_reg = (instr >> 9) & 0b111;
-        // After doing &, it is already automatically sign extended by Rust's u16 type
         let pc_offset = sign_extend(instr & 0x1ff, 9);
         let current_pc = self.registers.program_counter();
         let pointer_address = pc_offset + current_pc;
@@ -157,6 +156,19 @@ impl Lc3Vm {
 
         let br_val = Wrapping(self.get_reg_val_by_id(base_reg));
         let address = br_val + offset;
+        let value = self.memory.read(address.0);
+        self.set_reg_val_by_id(dest_reg, value);
+        let flag = ConditionFlag::parse_u16(value);
+        self.registers.set_cond_reg(flag);
+    }
+
+    /// Performs the `LEA` operation
+    fn lea_op(&mut self, instr: u16) {
+        let dest_reg = (instr >> 9) & 0b111;
+        let pc_offset = Wrapping(sign_extend(instr & 0x1ff, 9));
+        let current_pc = Wrapping(self.registers.program_counter());
+        let address = pc_offset + current_pc;
+
         let value = self.memory.read(address.0);
         self.set_reg_val_by_id(dest_reg, value);
         let flag = ConditionFlag::parse_u16(value);

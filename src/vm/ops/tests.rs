@@ -356,3 +356,22 @@ fn test_ldr_op() {
     let correct_flag: ConditionFlag = ConditionFlag::parse_u16(value);
     assert_eq!(flag, correct_flag);
 }
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_lea_op() {
+    let data: u16 = 1234;
+    let address: u16 = 0x3050;
+    // let offset = desired_address - Lc3Vm::DEFAULT_PC_START;
+    // LEA R2, ${offset}
+    let instr: u16 = 0b1010_010_001010000;
+
+    let mut vm = Lc3Vm::new();
+    vm.memory.write(address, data);
+    vm.lea_op(instr);
+    let reg_val = vm.get_reg_val_by_id(2);
+    assert_eq!(reg_val, data);
+    // Test flag
+    let flag = vm.get_cond_flag();
+    assert_eq!(flag, ConditionFlag::Pos);
+}
