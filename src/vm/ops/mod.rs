@@ -4,13 +4,80 @@
 #[cfg(test)]
 mod tests;
 
-use std::num::Wrapping;
+use std::{num::Wrapping};
 
 use super::{registers::ConditionFlag, Lc3Vm};
 use crate::bitwise_utils::sign_extend;
 
+enum OpCode {
+    Add,
+    And,
+    Br,
+    Jmp,
+    Jsr,
+    Ld,
+    Ldi,
+    Ldr,
+    Lea,
+    Not,
+    Rti,
+    St,
+    Sti,
+    Str,
+    Trap,
+}
+
+impl TryFrom<u16> for OpCode {
+    // Use empty type, the only reason it will fail is if the opcode is unrecognized
+    type Error = ();
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        let opcode = match value {
+            0b0001 => Self::Add,
+            0b0101 => Self::And,
+            0b0000 => Self::Br,
+            0b1100 => Self::Jmp,
+            0b0100 => Self::Jsr,
+            0b0010 => Self::Ld,
+            0b1010 => Self::Ldi,
+            0b0110 => Self::Ldr,
+            0b1110 => Self::Lea,
+            0b1001 => Self::Not,
+            0b1000 => Self::Rti,
+            0b0011 => Self::St,
+            0b1011 => Self::Sti,
+            0b0111 => Self::Str,
+            0b1111 => Self::Trap,
+            _ => return Err(())
+        };
+        Ok(opcode)
+    }
+}
+
 // https://www.jmeiners.com/lc3-vm/supplies/lc3-isa.pdf
 impl Lc3Vm {
+    /// Determine the correct operation to run, and run it
+    pub fn run_op(&mut self, instr: u16) {
+        let opcode_raw = instr >> 12;
+        let opcode = OpCode::try_from(opcode_raw).expect("Invalid opcode detected");
+        match opcode {
+            OpCode::Add => self.add_op(instr),
+            OpCode::And => self.and_op(instr),
+            OpCode::Br => self.br_op(instr),
+            OpCode::Jmp => self.jmp_op(instr),
+            OpCode::Jsr => self.jsr_op(instr),
+            OpCode::Ld => self.ld_op(instr),
+            OpCode::Ldi => self.ldi_op(instr),
+            OpCode::Ldr => self.ldr_op(instr),
+            OpCode::Lea => self.lea_op(instr),
+            OpCode::Not => self.not_op(instr),
+            OpCode::Rti => self.rti_op(instr),
+            OpCode::St => self.st_op(instr),
+            OpCode::Sti => self.sti_op(instr),
+            OpCode::Str => self.str_op(instr),
+            OpCode::Trap => todo!()
+        };
+    }
+
     /// Performs the `ADD` operation
     fn add_op(&mut self, instr: u16) {
         // Use bitwise AND to retrieve only the bit that we are interested in

@@ -1,7 +1,6 @@
 mod memory;
 mod ops;
 mod registers;
-mod traps;
 
 use std::cmp::Ordering;
 
@@ -31,7 +30,7 @@ impl Lc3Vm {
             let instr = self.memory.read(self.registers.program_counter());
             self.registers.increment_program_counter();
             // First 4 bits of an instruction are the opcodes
-            let opcode = instr >> 12;
+            self.run_op(instr);
         }
     }
 
