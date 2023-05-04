@@ -136,10 +136,10 @@ impl Lc3Vm {
     /// Performs the `LDI` operation
     fn ldi_op(&mut self, instr: u16) {
         let dest_reg = (instr >> 9) & 0b111;
-        let pc_offset = sign_extend(instr & 0x1ff, 9);
-        let current_pc = self.registers.program_counter();
+        let pc_offset = Wrapping(sign_extend(instr & 0x1ff, 9));
+        let current_pc = Wrapping(self.registers.program_counter());
         let pointer_address = pc_offset + current_pc;
-        let final_address = self.memory.read(pointer_address);
+        let final_address = self.memory.read(pointer_address.0);
         let value = self.memory.read(final_address);
         self.set_reg_val_by_id(dest_reg, value);
         // Check if value is positive or negative to set the flags
@@ -193,13 +193,24 @@ impl Lc3Vm {
 
     /// Performs the `ST` operation
     fn st_op(&mut self, instr: u16) {
-        let offset = instr & 0x1ff;
+        let pc_offset = Wrapping(sign_extend(instr & 0x1ff, 9));
         let sr = (instr >> 9) & 0x7;
         let sr_val = self.get_reg_val_by_id(sr);
 
         let current_pc = Wrapping(self.registers.program_counter());
-        let offset_extended = Wrapping(sign_extend(offset, 9));
-        let address = (current_pc + offset_extended).0;
-        self.memory.write(address, sr_val);
+        let address = current_pc + pc_offset;
+        self.memory.write(address.0, sr_val);
+    }
+
+    /// Performs the `STI` operation
+    fn sti_op(&mut self, instr: u16) {
+        let pc_offset = Wrapping(sign_extend(instr & 0x1ff, 9));
+        let sr = (instr >> 9) & 0x7;
+        let sr_val = self.get_reg_val_by_id(sr);
+
+        let current_pc = Wrapping(self.registers.program_counter());
+        let pointer_address = current_pc + pc_offset;
+        let final_address = self.memory.read(pointer_address.0);
+        self.memory.write(final_address, sr_val);
     }
 }

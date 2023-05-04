@@ -402,3 +402,20 @@ fn test_st_op() {
     let value = vm.memory.read(address);
     assert_eq!(data, value);
 }
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_sti_op() {
+    let mut vm = Lc3Vm::new();
+    let data = 19111;
+    let final_address: u16 = 0x3085;
+    let pointer_address: u16 = 0x3050;
+
+    // STI R4, 
+    let instr: u16 = 0b1011_100_001010000;
+    vm.set_reg_val_by_id(4, data);
+    vm.memory.write(pointer_address, final_address);
+    vm.sti_op(instr);
+    let value = vm.memory.read(final_address);
+    assert_eq!(data, value);
+}
