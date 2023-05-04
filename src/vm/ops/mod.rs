@@ -53,6 +53,31 @@ impl TryFrom<u16> for OpCode {
     }
 }
 
+enum TrapVector {
+    Getc = 0x20,
+    Out = 0x21,
+    Puts = 0x22,
+    In = 0x23,
+    Putsp = 0x24,
+    Halt = 0x25,
+}
+
+impl TryFrom<u16> for TrapVector {
+    type Error = ();
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        let trap_vec = match value {
+            0x20 => Self::Getc,
+            0x21 => Self::Out,
+            0x22 => Self::Puts,
+            0x23 => Self::In,
+            0x24 => Self::Putsp,
+            0x25 => Self::Halt,
+            _ => return Err(()),
+        };
+        Ok(trap_vec)
+    }
+}
+
 // https://www.jmeiners.com/lc3-vm/supplies/lc3-isa.pdf
 impl Lc3Vm {
     /// Determine the correct operation to run, and run it
@@ -74,7 +99,7 @@ impl Lc3Vm {
             OpCode::St => self.st_op(instr),
             OpCode::Sti => self.sti_op(instr),
             OpCode::Str => self.str_op(instr),
-            OpCode::Trap => todo!()
+            OpCode::Trap => self.trap_op(instr),
         };
     }
 
@@ -294,5 +319,17 @@ impl Lc3Vm {
         let base_reg_val = Wrapping(self.get_reg_val_by_id(base_reg));
         let address = base_reg_val + offset;
         self.memory.write(address.0, sr_val);
+    }
+
+    /// Performs the `TRAP` operation
+    fn trap_op(&mut self, instr: u16) {
+        let current_pc = self.registers.program_counter();
+        self.set_reg_val_by_id(7, current_pc);
+
+        let trap_vec_raw = instr & 0xff;
+        // Use the enum to parse the raw trap vector code, to make sure it is a valid
+        // trap vector code
+        let trap_vec = TrapVector::try_from(trap_vec_raw).expect("Invalid trap vector");
+        self.registers.set_program_counter(trap_vec as u16);
     }
 }
