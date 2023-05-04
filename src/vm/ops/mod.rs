@@ -1,3 +1,6 @@
+//! This module contains the implementation code for the "opcodes" instructions
+//! provided in the LC3 ISA specifications
+
 #[cfg(test)]
 mod tests;
 
