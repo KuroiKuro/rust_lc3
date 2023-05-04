@@ -185,4 +185,21 @@ impl Lc3Vm {
         let flag = ConditionFlag::parse_u16(value);
         self.registers.set_cond_reg(flag);
     }
+
+    /// Performs the `RTI` operation
+    fn rti_op(&mut self, _instr: u16) {
+        todo!()
+    }
+
+    /// Performs the `ST` operation
+    fn st_op(&mut self, instr: u16) {
+        let offset = instr & 0x1ff;
+        let sr = (instr >> 9) & 0x7;
+        let sr_val = self.get_reg_val_by_id(sr);
+
+        let current_pc = Wrapping(self.registers.program_counter());
+        let offset_extended = Wrapping(sign_extend(offset, 9));
+        let address = (current_pc + offset_extended).0;
+        self.memory.write(address, sr_val);
+    }
 }

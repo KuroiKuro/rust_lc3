@@ -388,3 +388,17 @@ fn test_not_op() {
     let value = vm.get_reg_val_by_id(4);
     assert_eq!(value, !num);
 }
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_st_op() {
+    let mut vm = Lc3Vm::new();
+    let data = 7741;
+    vm.set_reg_val_by_id(4, data);
+    let address: u16 = 0x3050;
+    // ST R4, 
+    let instr: u16 = 0b0011_100_001010000;
+    vm.st_op(instr);
+    let value = vm.memory.read(address);
+    assert_eq!(data, value);
+}
