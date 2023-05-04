@@ -419,3 +419,24 @@ fn test_sti_op() {
     let value = vm.memory.read(final_address);
     assert_eq!(data, value);
 }
+
+#[test]
+#[allow(clippy::unusual_byte_groupings)]
+fn test_str_op() {
+    let mut vm = Lc3Vm::new();
+
+    let data: u16 = 47;
+    vm.set_reg_val_by_id(4, data);
+    
+    // The final address 0x3085 should be computed from adding
+    // base_reg_addr_data to the offset in the instruction
+    let desired_address: u16 = 0x3085;
+    let base_reg_addr_data: u16 = 0x3070;
+    vm.set_reg_val_by_id(2, base_reg_addr_data);
+    
+    // STR R4, R2
+    let instr: u16 = 0b0111_100_010_010101;
+    vm.str_op(instr);
+    let value = vm.memory.read(desired_address);
+    assert_eq!(data, value);
+}

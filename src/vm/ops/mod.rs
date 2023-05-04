@@ -213,4 +213,16 @@ impl Lc3Vm {
         let final_address = self.memory.read(pointer_address.0);
         self.memory.write(final_address, sr_val);
     }
+
+    /// Performs the `STR` operation
+    fn str_op(&mut self, instr: u16) {
+        let offset = Wrapping(sign_extend(instr & 0x3f, 6));
+        let base_reg = (instr >> 6) & 0x7;
+        let sr = (instr >> 9) & 0x7;
+
+        let sr_val = self.get_reg_val_by_id(sr);
+        let base_reg_val = Wrapping(self.get_reg_val_by_id(base_reg));
+        let address = base_reg_val + offset;
+        self.memory.write(address.0, sr_val);
+    }
 }
