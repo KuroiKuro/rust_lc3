@@ -81,7 +81,7 @@ impl TryFrom<u16> for TrapVector {
 // https://www.jmeiners.com/lc3-vm/supplies/lc3-isa.pdf
 impl Lc3Vm {
     /// Determine the correct operation to run, and run it
-    pub fn run_op(&mut self, instr: u16) {
+    fn run_op(&mut self, instr: u16) {
         let opcode_raw = instr >> 12;
         let opcode = OpCode::try_from(opcode_raw).expect("Invalid opcode detected");
         match opcode {
