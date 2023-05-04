@@ -52,7 +52,7 @@ pub enum ConditionFlag {
 
 impl ConditionFlag {
     /// Given a `u16` value, determine what is the flag that will be set.
-    /// 
+    ///
     /// If the value equals to `0`, then the flag will be `Zro`. Otherwise,
     /// inspect the most significant bit. If the most significant bit is `1`, then
     /// the number is a negative value and the flag will be `Neg`, otherwise it will

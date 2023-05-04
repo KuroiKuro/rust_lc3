@@ -34,7 +34,7 @@ impl Lc3Vm {
         // Instead of using an i16, we use a u16 even though the numbers can
         // be negative. This is to simulate working on the raw binary data
         // instead of using Rust's datatype-related functionality.
-        // 
+        //
         // It's possible that one or more of the u16s are negative, in which case
         // the most significant bit will be `1`. Adding such a u16 to another one
         // can result in an integer overflow, causing Rust to panic. However,
@@ -81,7 +81,7 @@ impl Lc3Vm {
         let offset = instr & 0b111111111;
         let current_pc = self.registers.program_counter();
         let br_address = offset + current_pc;
-        
+
         let flag = self.get_cond_flag();
         let will_br = match (test_neg, test_zro, test_pos) {
             (true, true, true) => true,
@@ -91,7 +91,7 @@ impl Lc3Vm {
             (false, true, true) => flag == ConditionFlag::Pos || flag == ConditionFlag::Zro,
             (false, true, false) => flag == ConditionFlag::Zro,
             (true, false, true) => flag == ConditionFlag::Neg || flag == ConditionFlag::Pos,
-            (false, false, false) => false
+            (false, false, false) => false,
         };
 
         if will_br {
@@ -122,7 +122,7 @@ impl Lc3Vm {
             self.get_reg_val_by_id(base_reg)
         };
         self.registers.set_program_counter(new_pc_addr);
-    } 
+    }
 
     /// Performs the `LD` operation
     fn ld_op(&mut self, instr: u16) {
