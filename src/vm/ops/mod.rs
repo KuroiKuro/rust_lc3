@@ -4,7 +4,7 @@
 #[cfg(test)]
 mod tests;
 
-use std::{num::Wrapping};
+use std::num::Wrapping;
 
 use super::{registers::ConditionFlag, Lc3Vm};
 use crate::bitwise_utils::sign_extend;
@@ -47,7 +47,7 @@ impl TryFrom<u16> for OpCode {
             0b1011 => Self::Sti,
             0b0111 => Self::Str,
             0b1111 => Self::Trap,
-            _ => return Err(())
+            _ => return Err(()),
         };
         Ok(opcode)
     }

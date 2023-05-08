@@ -1,6 +1,6 @@
-use crate::vm::{Lc3Vm, registers::RegisterName};
+use crate::vm::{registers::RegisterName, Lc3Vm};
 use ascii::AsciiChar;
-use std::{io::Write};
+use std::io::Write;
 use std::str::from_utf8;
 
 #[test]
@@ -13,7 +13,7 @@ fn test_puts() {
     let test_string = "Hello world!";
     let str_chars = test_string.chars();
     let ascii_chars = str_chars.map(AsciiChar::new);
-    
+
     // Write test string
     let mut current_address = start_address;
     for ascii_char in ascii_chars {
