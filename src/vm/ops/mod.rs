@@ -331,5 +331,9 @@ impl Lc3Vm {
         // trap vector code
         let trap_vec = TrapVector::try_from(trap_vec_raw).expect("Invalid trap vector");
         self.registers.set_program_counter(trap_vec as u16);
+        // Run code
+        todo!();
+
+        self.registers.set_program_counter(current_pc);
     }
 }

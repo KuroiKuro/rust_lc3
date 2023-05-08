@@ -1,6 +1,7 @@
 mod memory;
 mod ops;
 mod registers;
+mod trap_vecs;
 
 use std::cmp::Ordering;
 
