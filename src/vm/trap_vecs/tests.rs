@@ -17,6 +17,18 @@ fn test_getc() {
 }
 
 #[test]
+fn test_out() {
+    let mut vm = Lc3Vm::new();
+    let test_char = 'w' as u16;
+    vm.registers.set_reg_value(RegisterName::R0, test_char);
+    let mut output: Vec<u8> = Vec::new();
+    vm.out(&mut output);
+    assert_eq!(output.len(), 1);
+    let read_char = output[0] as u16;
+    assert_eq!(test_char, read_char);
+}
+
+#[test]
 fn test_puts() {
     let mut vm = Lc3Vm::new();
     let start_address = 0x303b;

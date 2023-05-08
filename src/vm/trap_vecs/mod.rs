@@ -20,6 +20,19 @@ impl Lc3Vm {
             .set_reg_value(RegisterName::R0, ascii_char as u16);
     }
 
+    /// Write a character in R0[7:0] to the console display.
+    fn out<W>(&mut self, output_writer: &mut W)
+    where
+        W: Write
+    {
+        let read_data = self.registers.get_reg_value(RegisterName::R0);
+        // Read least significant bits for parsing ascii character to print
+        let byte_slice: [u8; 2] = read_data.to_be_bytes();
+        let char_byte = byte_slice[1];
+        let ascii_char = AsciiChar::from_ascii(char_byte).unwrap();
+        write!(output_writer, "{}", ascii_char).unwrap();
+    }
+
     /// Write a string of ASCII characters to the console display.
     /// The characters are contained in consecutive memory locations,
     /// one character per memory location, starting with the address
