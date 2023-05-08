@@ -77,7 +77,7 @@ impl Lc3Vm {
         W: Write,
     {
         // We specify our own prompt
-        output_writer.write_all(IN_TROUTINE_PROMPT.as_bytes()).unwrap();
+        write!(output_writer, "{}", IN_TROUTINE_PROMPT).unwrap();
         let mut input_buf: [u8; 1] = [0];
         input_reader.read_exact(&mut input_buf).unwrap();
         output_writer.write_all(&input_buf).unwrap();
