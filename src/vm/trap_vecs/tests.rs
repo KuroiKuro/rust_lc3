@@ -1,10 +1,22 @@
 use crate::vm::{registers::RegisterName, Lc3Vm};
 use ascii::AsciiChar;
-use std::io::Write;
 use std::str::from_utf8;
 
 #[test]
-#[allow(clippy::unusual_byte_groupings)]
+fn test_getc() {
+    let mut vm = Lc3Vm::new();
+    let mut input = "g".as_bytes();
+    vm.getc(&mut input);
+    let read_char = vm.registers.get_reg_value(RegisterName::R0);
+    assert_eq!(read_char, 'g' as u16);
+
+    let mut input = "rs".as_bytes();
+    vm.getc(&mut input);
+    let read_char = vm.registers.get_reg_value(RegisterName::R0);
+    assert_eq!(read_char, 'r' as u16);
+}
+
+#[test]
 fn test_puts() {
     let mut vm = Lc3Vm::new();
     let start_address = 0x303b;

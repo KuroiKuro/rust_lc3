@@ -3,9 +3,23 @@ mod tests;
 
 use super::{registers::RegisterName, Lc3Vm};
 use ascii::AsciiChar;
-use std::io::{self, Write};
+use std::io::{self, Read, Write};
 
 impl Lc3Vm {
+    /// Read a single character from the keyboard. The character is not echoed onto
+    /// the console. Its ASCII code is copied into R0.
+    /// The high eight bits of R0 are cleared.
+    fn getc<R>(&mut self, input_reader: &mut R)
+    where
+        R: Read,
+    {
+        let mut read_char: [u8; 1] = [0];
+        input_reader.read_exact(&mut read_char).unwrap();
+        let ascii_char = AsciiChar::new(read_char[0] as char);
+        self.registers
+            .set_reg_value(RegisterName::R0, ascii_char as u16);
+    }
+
     /// Write a string of ASCII characters to the console display.
     /// The characters are contained in consecutive memory locations,
     /// one character per memory location, starting with the address
