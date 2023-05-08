@@ -5,6 +5,8 @@ use super::{registers::RegisterName, Lc3Vm};
 use ascii::AsciiChar;
 use std::io::{self, Read, Write};
 
+const IN_TROUTINE_PROMPT: &str = "Enter a character: ";
+
 impl Lc3Vm {
     /// Read a single character from the keyboard. The character is not echoed onto
     /// the console. Its ASCII code is copied into R0.
@@ -64,5 +66,22 @@ impl Lc3Vm {
             write!(output_writer, "{}", print_char).unwrap();
             current_addr += 1;
         }
+    }
+
+    /// Print a prompt on the screen and read a single character from the keyboard.
+    /// The character is echoed onto the console monitor, and its ASCII code is
+    /// copied into R0. The high eight bits of R0 are cleared.
+    fn in_troutine<R, W>(&mut self, input_reader: &mut R, output_writer: &mut W)
+    where
+        R: Read,
+        W: Write,
+    {
+        // We specify our own prompt
+        output_writer.write_all(IN_TROUTINE_PROMPT.as_bytes()).unwrap();
+        let mut input_buf: [u8; 1] = [0];
+        input_reader.read_exact(&mut input_buf).unwrap();
+        output_writer.write_all(&input_buf).unwrap();
+        let ascii_char = AsciiChar::new(input_buf[0] as char);
+        self.registers.set_reg_value(RegisterName::R0, ascii_char as u16);
     }
 }

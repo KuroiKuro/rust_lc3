@@ -1,4 +1,5 @@
 use crate::vm::{registers::RegisterName, Lc3Vm};
+use super::IN_TROUTINE_PROMPT;
 use ascii::AsciiChar;
 use std::str::from_utf8;
 
@@ -50,4 +51,21 @@ fn test_puts_troutine() {
     vm.puts_troutine(&mut output);
     let printed_string = from_utf8(&output).unwrap();
     assert_eq!(test_string, printed_string);
+}
+
+#[test]
+fn test_in_troutine() {
+    let mut vm = Lc3Vm::new();
+
+    let expected_char = 'F';
+    let mut input = "F".as_bytes();
+    let mut output: Vec<u8> = Vec::new();
+
+    vm.in_troutine(&mut input, &mut output);
+    let expected_output = format!("{}{}", IN_TROUTINE_PROMPT, expected_char);
+    let printed_output = from_utf8(&output).unwrap();
+    assert_eq!(printed_output, expected_output);
+
+    let saved_char = vm.registers.get_reg_value(RegisterName::R0);
+    assert_eq!(saved_char, expected_char as u16);
 }
