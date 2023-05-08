@@ -9,7 +9,7 @@ impl Lc3Vm {
     /// Read a single character from the keyboard. The character is not echoed onto
     /// the console. Its ASCII code is copied into R0.
     /// The high eight bits of R0 are cleared.
-    fn getc<R>(&mut self, input_reader: &mut R)
+    fn getc_troutine<R>(&mut self, input_reader: &mut R)
     where
         R: Read,
     {
@@ -21,7 +21,7 @@ impl Lc3Vm {
     }
 
     /// Write a character in R0[7:0] to the console display.
-    fn out<W>(&mut self, output_writer: &mut W)
+    fn out_troutine<W>(&mut self, output_writer: &mut W)
     where
         W: Write
     {
@@ -38,7 +38,7 @@ impl Lc3Vm {
     /// one character per memory location, starting with the address
     /// specified in R0.
     /// Writing terminates with the occurrence of x0000 in a memory location
-    fn puts<W>(&mut self, output_writer: &mut W)
+    fn puts_troutine<W>(&mut self, output_writer: &mut W)
     where
         W: Write,
     {

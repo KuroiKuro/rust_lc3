@@ -3,33 +3,33 @@ use ascii::AsciiChar;
 use std::str::from_utf8;
 
 #[test]
-fn test_getc() {
+fn test_getc_troutine() {
     let mut vm = Lc3Vm::new();
     let mut input = "g".as_bytes();
-    vm.getc(&mut input);
+    vm.getc_troutine(&mut input);
     let read_char = vm.registers.get_reg_value(RegisterName::R0);
     assert_eq!(read_char, 'g' as u16);
 
     let mut input = "rs".as_bytes();
-    vm.getc(&mut input);
+    vm.getc_troutine(&mut input);
     let read_char = vm.registers.get_reg_value(RegisterName::R0);
     assert_eq!(read_char, 'r' as u16);
 }
 
 #[test]
-fn test_out() {
+fn test_out_troutine() {
     let mut vm = Lc3Vm::new();
     let test_char = 'w' as u16;
     vm.registers.set_reg_value(RegisterName::R0, test_char);
     let mut output: Vec<u8> = Vec::new();
-    vm.out(&mut output);
+    vm.out_troutine(&mut output);
     assert_eq!(output.len(), 1);
     let read_char = output[0] as u16;
     assert_eq!(test_char, read_char);
 }
 
 #[test]
-fn test_puts() {
+fn test_puts_troutine() {
     let mut vm = Lc3Vm::new();
     let start_address = 0x303b;
     vm.registers.set_reg_value(RegisterName::R0, start_address);
@@ -47,7 +47,7 @@ fn test_puts() {
     vm.memory.write(current_address, 0);
 
     let mut output: Vec<u8> = Vec::new();
-    vm.puts(&mut output);
+    vm.puts_troutine(&mut output);
     let printed_string = from_utf8(&output).unwrap();
     assert_eq!(test_string, printed_string);
 }
