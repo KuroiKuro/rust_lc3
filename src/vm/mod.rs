@@ -13,6 +13,7 @@ use self::registers::{ConditionFlag, RegisterName};
 pub struct Lc3Vm {
     registers: Registers,
     memory: Memory,
+    running: bool,
 }
 
 impl Lc3Vm {
@@ -21,13 +22,15 @@ impl Lc3Vm {
     pub fn new() -> Self {
         let registers = Registers::new();
         let memory = Memory::new();
-        let mut vm = Self { registers, memory };
+        let running = false;
+        let mut vm = Self { registers, memory, running };
         vm.registers.set_program_counter(Self::DEFAULT_PC_START);
         vm
     }
 
     pub fn run(&mut self) {
-        loop {
+        self.running = true;
+        while self.running {
             let instr = self.memory.read(self.registers.program_counter());
             self.registers.increment_program_counter();
             // First 4 bits of an instruction are the opcodes

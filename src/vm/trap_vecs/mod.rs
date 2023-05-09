@@ -6,6 +6,7 @@ use ascii::AsciiChar;
 use std::io::{self, Read, Write};
 
 const IN_TROUTINE_PROMPT: &str = "Enter a character: ";
+const HALT_MESSAGE: &str = "LC3 VM execution halted";
 
 impl Lc3Vm {
     /// Read a single character from the keyboard. The character is not echoed onto
@@ -112,5 +113,10 @@ impl Lc3Vm {
             write!(output_writer, "{}{}", first_char, second_char).unwrap();
             current_address += 1;
         }
+    }
+
+    /// Halt execution and print a message on the console.
+    fn halt_troutine(&mut self) {
+        self.running = false;
     }
 }

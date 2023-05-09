@@ -105,3 +105,11 @@ fn test_putsp_troutine() {
     let print_str = from_utf8(&output).unwrap();
     assert_eq!(test_str, print_str);
 }
+
+#[test]
+fn test_halt_troutine() {
+    let mut vm = Lc3Vm::new();
+    vm.running = true;
+    vm.halt_troutine();
+    assert!(!vm.running);
+}
