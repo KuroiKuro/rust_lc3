@@ -69,3 +69,39 @@ fn test_in_troutine() {
     let saved_char = vm.registers.get_reg_value(RegisterName::R0);
     assert_eq!(saved_char, expected_char as u16);
 }
+
+#[test]
+fn test_putsp_troutine() {
+    let mut vm = Lc3Vm::new();
+    let start_address = 0x30BA;
+    vm.registers.set_reg_value(RegisterName::R0, start_address);
+
+    let test_str = "Hesitation is defeat";
+    let mem_vec = test_str.chars()
+        .collect::<Vec<char>>()
+        .chunks(2)
+        .map(|char_arr| {
+            if char_arr.len() == 2 {
+                let first_char = char_arr[0];
+                let second_char = char_arr[1];
+                // Write the first char as the least significant bits
+                (second_char as u16) << 8 | first_char as u16
+            }
+            else {
+                char_arr[0] as u16
+            }
+        })
+        .collect::<Vec<u16>>();
+    
+    let mut current_address = start_address;
+    for data in mem_vec {
+        vm.memory.write(current_address, data);
+        current_address += 1;
+    }
+    vm.memory.write(current_address, 0);
+
+    let mut output: Vec<u8> = Vec::new();
+    vm.putsp_troutine(&mut output);
+    let print_str = from_utf8(&output).unwrap();
+    assert_eq!(test_str, print_str);
+}
