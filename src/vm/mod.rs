@@ -5,13 +5,7 @@ mod registers;
 mod tests;
 mod trap_vecs;
 
-use std::{
-    cmp::Ordering,
-    fs::File,
-    io::{BufReader, Read},
-    path::Path,
-    slice::Chunks,
-};
+use std::{fs::File, io::Read, path::Path};
 
 use memory::Memory;
 use registers::Registers;

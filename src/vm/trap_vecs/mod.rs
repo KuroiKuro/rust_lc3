@@ -3,7 +3,7 @@ mod tests;
 
 use super::{registers::RegisterName, Lc3Vm};
 use ascii::AsciiChar;
-use std::io::{self, Read, Write};
+use std::io::{Read, Write};
 
 const IN_TROUTINE_PROMPT: &str = "Enter a character: ";
 const HALT_MESSAGE: &str = "LC3 VM execution halted";

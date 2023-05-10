@@ -1,7 +1,5 @@
 use crate::vm::Lc3Vm;
 
-use super::*;
-
 #[test]
 fn test_read_kbsr() {
     let vm = Lc3Vm::new();
