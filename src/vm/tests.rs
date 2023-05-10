@@ -9,15 +9,10 @@ fn test_load_program() {
     let start_address = 0x3001;
     // Create a tempfile to contain the testing program logic
     let mut temp_file = NamedTempFile::new().unwrap();
-    let program_data: Vec<u16> = vec![
-        start_address,
-        0x39ab,
-        0x341f,
-        0x3333,
-        0x31cb,
-    ];
+    let program_data: Vec<u16> = vec![start_address, 0x39ab, 0x341f, 0x3333, 0x31cb];
 
-    let write_data = program_data.iter()
+    let write_data = program_data
+        .iter()
         .flat_map(|prog_data_piece| prog_data_piece.to_le_bytes())
         .collect::<Vec<u8>>();
     temp_file.write_all(&write_data).unwrap();
@@ -58,7 +53,7 @@ fn test_validate_file_len() {
     let invalid_file_len: u64 = 65536;
     let valid_file_len: u64 = 2000;
     let origin = 0x3000;
-    
+
     let invalid_check = Lc3Vm::validate_file_len(invalid_file_len, origin);
     let valid_check = Lc3Vm::validate_file_len(valid_file_len, origin);
     assert!(valid_check.is_ok());

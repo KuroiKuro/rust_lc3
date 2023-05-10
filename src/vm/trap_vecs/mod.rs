@@ -26,7 +26,7 @@ impl Lc3Vm {
     /// Write a character in R0[7:0] to the console display.
     fn out_troutine<W>(&mut self, output_writer: &mut W)
     where
-        W: Write
+        W: Write,
     {
         let read_data = self.registers.get_reg_value(RegisterName::R0);
         // Read least significant bits for parsing ascii character to print
@@ -82,7 +82,8 @@ impl Lc3Vm {
         input_reader.read_exact(&mut input_buf).unwrap();
         output_writer.write_all(&input_buf).unwrap();
         let ascii_char = AsciiChar::new(input_buf[0] as char);
-        self.registers.set_reg_value(RegisterName::R0, ascii_char as u16);
+        self.registers
+            .set_reg_value(RegisterName::R0, ascii_char as u16);
     }
 
     /// Write a string of ASCII characters to the console. The characters are
@@ -91,11 +92,11 @@ impl Lc3Vm {
     /// The ASCII code contained in bits [7:0] of a memory location is written to the
     /// console first. Then the ASCII code contained in bits [15:8] of that memory
     /// location is written to the console.
-    /// 
+    ///
     /// (A character string consisting of an odd number of characters to be written
     /// will have x00 in bits [15:8] of the memory location containing the last
     /// character to be written.)
-    /// 
+    ///
     /// Writing terminates with the occurrence of x0000 in a memory location
     fn putsp_troutine(&mut self, output_writer: &mut impl Write) {
         let start_address = self.registers.get_reg_value(RegisterName::R0);
@@ -109,7 +110,7 @@ impl Lc3Vm {
             let bytes_slice: [u8; 2] = mem_data.to_be_bytes();
             let first_char = AsciiChar::new(bytes_slice[1] as char);
             let second_char = AsciiChar::new(bytes_slice[0] as char);
-            
+
             write!(output_writer, "{}{}", first_char, second_char).unwrap();
             current_address += 1;
         }

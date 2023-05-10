@@ -1,5 +1,5 @@
-use crate::vm::{registers::RegisterName, Lc3Vm};
 use super::IN_TROUTINE_PROMPT;
+use crate::vm::{registers::RegisterName, Lc3Vm};
 use ascii::AsciiChar;
 use std::str::from_utf8;
 
@@ -77,7 +77,8 @@ fn test_putsp_troutine() {
     vm.registers.set_reg_value(RegisterName::R0, start_address);
 
     let test_str = "Hesitation is defeat";
-    let mem_vec = test_str.chars()
+    let mem_vec = test_str
+        .chars()
         .collect::<Vec<char>>()
         .chunks(2)
         .map(|char_arr| {
@@ -86,13 +87,12 @@ fn test_putsp_troutine() {
                 let second_char = char_arr[1];
                 // Write the first char as the least significant bits
                 (second_char as u16) << 8 | first_char as u16
-            }
-            else {
+            } else {
                 char_arr[0] as u16
             }
         })
         .collect::<Vec<u16>>();
-    
+
     let mut current_address = start_address;
     for data in mem_vec {
         vm.memory.write(current_address, data);

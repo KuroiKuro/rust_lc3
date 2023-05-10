@@ -1,11 +1,17 @@
 mod memory;
 mod ops;
 mod registers;
-mod trap_vecs;
 #[cfg(test)]
 mod tests;
+mod trap_vecs;
 
-use std::{cmp::Ordering, fs::File, io::{Read, BufReader}, slice::Chunks, path::Path};
+use std::{
+    cmp::Ordering,
+    fs::File,
+    io::{BufReader, Read},
+    path::Path,
+    slice::Chunks,
+};
 
 use memory::Memory;
 use registers::Registers;
@@ -25,13 +31,17 @@ impl Lc3Vm {
         let registers = Registers::new();
         let memory = Memory::new();
         let running = false;
-        let mut vm = Self { registers, memory, running };
+        let mut vm = Self {
+            registers,
+            memory,
+            running,
+        };
         vm.registers.set_program_counter(Self::DEFAULT_PC_START);
         vm
     }
 
     /// Load a compiled LC3 program for execution.
-    /// 
+    ///
     /// A given LC3 program will have its first 16 bits set to the memory address
     /// where the start of the program instructions should be loaded to. Subsequent
     /// bytes are then the program instructions
@@ -41,14 +51,16 @@ impl Lc3Vm {
         program_file.read_to_end(&mut file_contents).unwrap();
 
         // Read the origin first
-        let mut chunked = file_contents.as_slice()
-            .chunks(2);
+        let mut chunked = file_contents.as_slice().chunks(2);
 
         let chunk = chunked.next().unwrap();
         let origin = Self::read_u16(chunk);
         let file_len = program_file.metadata().unwrap().len();
         if let Err(e) = Self::validate_file_len(file_len, origin) {
-            panic!("The length of the file ({}) will be too large to fit into VM memory!", e);
+            panic!(
+                "The length of the file ({}) will be too large to fit into VM memory!",
+                e
+            );
         }
 
         let mut current_address = origin;
