@@ -1,3 +1,8 @@
+#[cfg(test)]
+mod tests;
+
+use std::io::Read;
+
 /// Maximum size a `u16` can hold
 const MEMORY_MAX: usize = 1 << 16;
 
@@ -24,14 +29,30 @@ pub enum DeviceRegister {
 }
 
 impl DeviceRegister {
-    fn from_address(address: u16) -> Option<Self> {
+    const KBSR_ADDR: u16 = 0xfe00;
+    const KBDR_ADDR: u16 = 0xfe02;
+    const DSR_ADDR: u16 = 0xfe04;
+    const DDR_ADDR: u16 = 0xfe06;
+    const MCR_ADDR: u16 = 0xfffe;
+
+    pub fn from_address(address: u16) -> Option<Self> {
         match address {
-            0xfe00 => Some(Self::Kbsr),
-            0xfe02 => Some(Self::Kbdr),
-            0xf304 => Some(Self::Dsr),
-            0xfe06 => Some(Self::Ddr),
-            0xfffe => Some(Self::Mcr),
+            Self::KBSR_ADDR => Some(Self::Kbsr),
+            Self::KBDR_ADDR => Some(Self::Kbdr),
+            Self::DSR_ADDR => Some(Self::Dsr),
+            Self::DDR_ADDR => Some(Self::Ddr),
+            Self::MCR_ADDR => Some(Self::Mcr),
             _ => None,
+        }
+    }
+
+    pub fn to_address(&self) -> u16 {
+        match self {
+            Self::Kbsr => Self::KBSR_ADDR,
+            Self::Kbdr => Self::KBDR_ADDR,
+            Self::Dsr => Self::DSR_ADDR,
+            Self::Ddr => Self::DDR_ADDR,
+            Self::Mcr => Self::MCR_ADDR,
         }
     }
 }
@@ -77,5 +98,15 @@ impl Memory {
     pub fn write(&mut self, address: u16, value: u16) {
         let address = address as usize;
         self.mem_arr[address].write(value);
+    }
+
+    fn read_kbsr(&self, input_reader: &mut impl Read) -> u16 {
+        // We need to check if the input has any new character
+        let mut buf: [u8; 1] = [0];
+        // If read_exact returns Err, then it means there's nothing
+        match input_reader.read_exact(&mut buf) {
+            Ok(_) => 0x8000,
+            Err(_) => 0,
+        }
     }
 }
