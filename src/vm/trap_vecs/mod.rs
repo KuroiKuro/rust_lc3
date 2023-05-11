@@ -118,6 +118,6 @@ impl Lc3Vm {
 
     /// Halt execution and print a message on the console.
     fn halt_troutine(&mut self) {
-        self.running = false;
+        self.halt();
     }
 }

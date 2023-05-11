@@ -77,12 +77,18 @@ impl MemorySlice {
 /// A struct containing the values of certain device registers where the value has to be saved
 struct MmapRegisters {
     kbdr: MemorySlice,
+    mcr: MemorySlice,
 }
 
 impl MmapRegisters {
-    fn new() -> Self { Self { kbdr: MemorySlice(0) } }
+    const MCR_DEFAULT_VALUE: u16 = 0x8000;
+    fn new() -> Self {
+        Self {
+            kbdr: MemorySlice(0),
+            mcr: MemorySlice(Self::MCR_DEFAULT_VALUE),
+        }
+    }
 }
-
 
 pub struct Memory {
     mem_arr: [MemorySlice; MEMORY_MAX],
@@ -93,7 +99,10 @@ impl Memory {
     pub fn new() -> Self {
         let mem_arr: [MemorySlice; MEMORY_MAX] = [MemorySlice(0); MEMORY_MAX];
         let mmap_registers = MmapRegisters::new();
-        Self { mem_arr, mmap_registers }
+        Self {
+            mem_arr,
+            mmap_registers,
+        }
     }
 
     /// Reads the value at the given memory address
@@ -116,6 +125,16 @@ impl Memory {
         self.mem_arr[address].write(value);
     }
 
+    pub fn mcr_is_cleared(&self) -> bool {
+        let mcr_value = self.mmap_registers.mcr.read();
+        let clock_bit = mcr_value >> 15;
+        clock_bit == 0
+    }
+
+    pub fn clear_mcr(&mut self) {
+        self.mmap_registers.mcr.write(0);
+    }
+
     fn read_kbsr(&mut self, input_reader: &mut impl Read) -> u16 {
         // We need to check if the input has any new character
         let mut buf: [u8; 1] = [0];
@@ -129,7 +148,7 @@ impl Memory {
                 // reserved and nothing else can read it (normally)
                 self.mmap_registers.kbdr.write(buf[0] as u16);
                 0x8000
-            },
+            }
         }
     }
 
@@ -141,6 +160,20 @@ impl Memory {
     /// simulated version, the display will always be ready so we always return `0x8000`
     fn read_dsr(&self) -> u16 {
         0x8000
+    }
+
+    /// When the program is running, the Machine control register should always return 0x8000,
+    /// unless the value has been set to some other value using `write_mcr`.
+    fn read_mcr(&self) -> u16 {
+        self.mmap_registers.mcr.read()
+    }
+
+    /// Writes a value to the Machine control register. Note that you can pass any arbitrary
+    /// number here, but in order to actually cause machine processing to stop, the most
+    /// significant bit must be `0` in order to work. It is not advised to write anything to
+    /// this device register for any other purpose apart from clearing the most signifcant bit
+    fn write_mcr(&mut self, value: u16) {
+        self.mmap_registers.mcr.write(value);
     }
 
     fn write_ddr(&mut self, value: u16, output_writer: &mut impl Write) {

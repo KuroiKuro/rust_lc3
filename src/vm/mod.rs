@@ -15,7 +15,6 @@ use self::registers::{ConditionFlag, RegisterName};
 pub struct Lc3Vm {
     registers: Registers,
     memory: Memory,
-    running: bool,
 }
 
 impl Lc3Vm {
@@ -24,11 +23,9 @@ impl Lc3Vm {
     pub fn new() -> Self {
         let registers = Registers::new();
         let memory = Memory::new();
-        let running = false;
         let mut vm = Self {
             registers,
             memory,
-            running,
         };
         vm.registers.set_program_counter(Self::DEFAULT_PC_START);
         vm
@@ -86,8 +83,7 @@ impl Lc3Vm {
     }
 
     pub fn run(&mut self) {
-        self.running = true;
-        while self.running {
+        while self.running() {
             let instr = self.memory.read(self.registers.program_counter());
             self.registers.increment_program_counter();
             // First 4 bits of an instruction are the opcodes
@@ -112,5 +108,17 @@ impl Lc3Vm {
     pub fn get_cond_flag(&self) -> ConditionFlag {
         let flag_reg_val = self.registers.cond_reg();
         ConditionFlag::from(flag_reg_val)
+    }
+
+    pub fn running(&self) -> bool {
+        !self.memory.mcr_is_cleared()
+    }
+
+    /// Halts the VM execution
+    pub fn halt(&mut self) {
+        // Use the `clear_mcr` function in the Memory struct to halt. This
+        // logic is in its own function so that we can change the halt
+        // implementation in future if required
+        self.memory.clear_mcr();
     }
 }

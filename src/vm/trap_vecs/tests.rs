@@ -109,7 +109,7 @@ fn test_putsp_troutine() {
 #[test]
 fn test_halt_troutine() {
     let mut vm = Lc3Vm::new();
-    vm.running = true;
     vm.halt_troutine();
-    assert!(!vm.running);
+    let running = vm.running();
+    assert!(!running);
 }

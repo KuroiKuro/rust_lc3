@@ -2,6 +2,8 @@ use ascii::AsciiChar;
 
 use crate::vm::Lc3Vm;
 
+use super::MmapRegisters;
+
 #[test]
 fn test_read_kbsr() {
     let mut vm = Lc3Vm::new();
@@ -36,6 +38,21 @@ fn test_read_kbdr() {
 fn test_read_dsr() {
     let vm = Lc3Vm::new();
     assert_eq!(vm.memory.read_dsr(), 0x8000);
+}
+
+#[test]
+fn test_read_mcr() {
+    let vm = Lc3Vm::new();
+    let expected_value = MmapRegisters::MCR_DEFAULT_VALUE;
+    let mcr_value = vm.memory.mmap_registers.mcr.read();
+    assert_eq!(mcr_value, expected_value);
+}
+
+#[test]
+fn test_write_mcr() {
+    let mut vm = Lc3Vm::new();
+    vm.memory.write_mcr(0);
+    assert!(!vm.running());
 }
 
 #[test]
