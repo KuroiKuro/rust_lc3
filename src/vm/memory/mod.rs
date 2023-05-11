@@ -130,4 +130,8 @@ impl Memory {
             },
         }
     }
+
+    fn read_kbdr(&self) -> u16 {
+        self.mmap_registers.kbdr.read()
+    }
 }

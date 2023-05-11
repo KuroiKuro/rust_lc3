@@ -22,3 +22,12 @@ fn test_read_kbsr() {
     let kbdr_val = vm.memory.mmap_registers.kbdr.read();
     assert_eq!(kbdr_val, expected_val);
 }
+
+#[test]
+fn test_read_kbdr() {
+    let mut vm = Lc3Vm::new();
+    let ascii_char = AsciiChar::new('x') as u16;
+    vm.memory.mmap_registers.kbdr.write(ascii_char);
+    let read_value = vm.memory.read_kbdr();
+    assert_eq!(read_value, ascii_char);
+}
