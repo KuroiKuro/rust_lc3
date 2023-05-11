@@ -31,3 +31,9 @@ fn test_read_kbdr() {
     let read_value = vm.memory.read_kbdr();
     assert_eq!(read_value, ascii_char);
 }
+
+#[test]
+fn test_read_dsr() {
+    let vm = Lc3Vm::new();
+    assert_eq!(vm.memory.read_dsr(), 0x8000);
+}

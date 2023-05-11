@@ -134,4 +134,10 @@ impl Memory {
     fn read_kbdr(&self) -> u16 {
         self.mmap_registers.kbdr.read()
     }
+
+    /// Handles reading of the `DeviceRegister::Dsr` (Display Status Register). In our
+    /// simulated version, the display will always be ready so we always return `0x8000`
+    fn read_dsr(&self) -> u16 {
+        0x8000
+    }
 }
