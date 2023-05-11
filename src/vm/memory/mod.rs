@@ -1,7 +1,9 @@
 #[cfg(test)]
 mod tests;
 
-use std::io::Read;
+use std::io::{Read, Write};
+
+use ascii::AsciiChar;
 
 /// Maximum size a `u16` can hold
 const MEMORY_MAX: usize = 1 << 16;
@@ -139,5 +141,11 @@ impl Memory {
     /// simulated version, the display will always be ready so we always return `0x8000`
     fn read_dsr(&self) -> u16 {
         0x8000
+    }
+
+    fn write_ddr(&mut self, value: u16, output_writer: &mut impl Write) {
+        let byte_slice = value.to_be_bytes();
+        let ascii_char = AsciiChar::from_ascii(byte_slice[1]).unwrap();
+        write!(output_writer, "{}", ascii_char).unwrap();
     }
 }

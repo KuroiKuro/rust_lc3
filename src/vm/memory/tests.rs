@@ -26,7 +26,7 @@ fn test_read_kbsr() {
 #[test]
 fn test_read_kbdr() {
     let mut vm = Lc3Vm::new();
-    let ascii_char = AsciiChar::new('x') as u16;
+    let ascii_char = AsciiChar::x as u16;
     vm.memory.mmap_registers.kbdr.write(ascii_char);
     let read_value = vm.memory.read_kbdr();
     assert_eq!(read_value, ascii_char);
@@ -36,4 +36,14 @@ fn test_read_kbdr() {
 fn test_read_dsr() {
     let vm = Lc3Vm::new();
     assert_eq!(vm.memory.read_dsr(), 0x8000);
+}
+
+#[test]
+fn test_write_ddr() {
+    let mut vm = Lc3Vm::new();
+    let print_char = AsciiChar::S;
+    let mut output_writer: Vec<u8> = Vec::new();
+    vm.memory.write_ddr(print_char as u16, &mut output_writer);
+    assert_eq!(output_writer.len(), 1);
+    assert_eq!(output_writer[0], print_char as u8);
 }
