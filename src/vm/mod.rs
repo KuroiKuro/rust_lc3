@@ -70,7 +70,7 @@ impl Lc3Vm {
         // Program file is in little endian, so convert it to big endian, which
         // is required in LC3
         let buf: [u8; 2] = [program_data_slice[0], program_data_slice[1]];
-        u16::from_le_bytes(buf)
+        u16::from_be_bytes(buf)
     }
 
     /// Validate that the program file is small enough to fit in the memory of
