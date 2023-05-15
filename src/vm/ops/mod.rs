@@ -193,11 +193,11 @@ impl Lc3Vm {
 
     /// Performs the `LD` operation
     fn ld_op(&mut self, instr: u16) {
-        let offset = sign_extend(instr & 0x1ff, 9);
+        let offset = Wrapping(sign_extend(instr & 0x1ff, 9));
         let dest_reg = (instr >> 9) & 0x7;
-        let current_pc = self.registers.program_counter();
+        let current_pc = Wrapping(self.registers.program_counter());
         let load_addr = current_pc + offset;
-        let value = self.memory.read(load_addr);
+        let value = self.memory.read(load_addr.0);
         self.set_reg_val_by_id(dest_reg, value);
         let flag = ConditionFlag::parse_u16(value);
         self.registers.set_cond_reg(flag);
