@@ -177,13 +177,13 @@ impl Lc3Vm {
     fn jsr_op(&mut self, instr: u16) {
         // Save PC into R7, PC should have been incremented already before
         // calling this op
-        let current_pc = self.registers.program_counter();
-        self.set_reg_val_by_id(7, current_pc);
+        let current_pc = Wrapping(self.registers.program_counter());
+        self.set_reg_val_by_id(7, current_pc.0);
         // Implement both the JSR and JSRR operation
         let jsr_mode = ((instr >> 11) & 1) == 1;
         let new_pc_addr = if jsr_mode {
-            let offset = sign_extend(instr & 0x7ff, 11);
-            current_pc + offset
+            let offset = Wrapping(sign_extend(instr & 0x7ff, 11));
+            (current_pc + offset).0
         } else {
             let base_reg = (instr >> 8) & 0b111;
             self.get_reg_val_by_id(base_reg)
