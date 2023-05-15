@@ -5,7 +5,7 @@ mod registers;
 mod tests;
 mod trap_vecs;
 
-use std::{fs::File, io::Read, path::Path};
+use std::{fs::File, io::{Read, self}, path::Path};
 
 use memory::Memory;
 use registers::Registers;
@@ -36,8 +36,8 @@ impl Lc3Vm {
     /// A given LC3 program will have its first 16 bits set to the memory address
     /// where the start of the program instructions should be loaded to. Subsequent
     /// bytes are then the program instructions
-    pub fn load_program(&mut self, file_path: &Path) {
-        let mut program_file = File::open(file_path).unwrap();
+    pub fn load_program(&mut self, file_path: &Path) -> io::Result<()> {
+        let mut program_file = File::open(file_path)?;
         let mut file_contents: Vec<u8> = Vec::new();
         program_file.read_to_end(&mut file_contents).unwrap();
 
@@ -60,6 +60,7 @@ impl Lc3Vm {
             self.memory.write(current_address, mem_data);
             current_address += 1;
         }
+        Ok(())
     }
 
     /// Reads two bytes from file data that has been converted into a `Chunks<u8>`,
