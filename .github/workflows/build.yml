@@ -20,5 +20,5 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
     - name: Strip debug symbols
-      run: strip lc3
+      run: strip target/release/lc3
     
