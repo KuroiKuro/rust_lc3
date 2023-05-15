@@ -6,7 +6,7 @@ mod tests;
 
 use std::num::Wrapping;
 
-use super::{registers::ConditionFlag, Lc3Vm};
+use super::{registers::ConditionFlag, Lc3Vm, trap_vecs::TrapVector};
 use crate::bitwise_utils::sign_extend;
 
 enum OpCode {
@@ -50,31 +50,6 @@ impl TryFrom<u16> for OpCode {
             _ => return Err(()),
         };
         Ok(opcode)
-    }
-}
-
-enum TrapVector {
-    Getc = 0x20,
-    Out = 0x21,
-    Puts = 0x22,
-    In = 0x23,
-    Putsp = 0x24,
-    Halt = 0x25,
-}
-
-impl TryFrom<u16> for TrapVector {
-    type Error = ();
-    fn try_from(value: u16) -> Result<Self, Self::Error> {
-        let trap_vec = match value {
-            0x20 => Self::Getc,
-            0x21 => Self::Out,
-            0x22 => Self::Puts,
-            0x23 => Self::In,
-            0x24 => Self::Putsp,
-            0x25 => Self::Halt,
-            _ => return Err(()),
-        };
-        Ok(trap_vec)
     }
 }
 
@@ -331,9 +306,11 @@ impl Lc3Vm {
         // trap vector code
         let trap_vec = TrapVector::try_from(trap_vec_raw).expect("Invalid trap vector");
         self.registers.set_program_counter(trap_vec as u16);
-        // Run code
-        todo!();
 
+        // Run trap routine
+        self.run_troutine(trap_vec);
+
+        // Reset the program counter after returning from the trap routine
         self.registers.set_program_counter(current_pc);
     }
 }

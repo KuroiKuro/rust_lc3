@@ -3,12 +3,51 @@ mod tests;
 
 use super::{registers::RegisterName, Lc3Vm};
 use ascii::AsciiChar;
-use std::io::{Read, Write};
+use std::io::{Read, Write, stdin, stdout};
 
 const IN_TROUTINE_PROMPT: &str = "Enter a character: ";
 const HALT_MESSAGE: &str = "LC3 VM execution halted";
 
+#[derive(Clone, Copy)]
+pub enum TrapVector {
+    Getc = 0x20,
+    Out = 0x21,
+    Puts = 0x22,
+    In = 0x23,
+    Putsp = 0x24,
+    Halt = 0x25,
+}
+
+impl TryFrom<u16> for TrapVector {
+    type Error = ();
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        let trap_vec = match value {
+            0x20 => Self::Getc,
+            0x21 => Self::Out,
+            0x22 => Self::Puts,
+            0x23 => Self::In,
+            0x24 => Self::Putsp,
+            0x25 => Self::Halt,
+            _ => return Err(()),
+        };
+        Ok(trap_vec)
+    }
+}
+
 impl Lc3Vm {
+    pub fn run_troutine(&mut self, trap_vec: TrapVector) {
+        let mut stdin = stdin().lock();
+        let mut stdout = stdout().lock();
+        match trap_vec {
+            TrapVector::Getc => self.getc_troutine(&mut stdin),
+            TrapVector::Out => self.out_troutine(&mut stdout),
+            TrapVector::Puts => self.puts_troutine(&mut stdout),
+            TrapVector::In => self.in_troutine(&mut stdin, &mut stdout),
+            TrapVector::Putsp => self.putsp_troutine(&mut stdout),
+            TrapVector::Halt => self.halt_troutine(),
+        }
+    }
+
     /// Read a single character from the keyboard. The character is not echoed onto
     /// the console. Its ASCII code is copied into R0.
     /// The high eight bits of R0 are cleared.
