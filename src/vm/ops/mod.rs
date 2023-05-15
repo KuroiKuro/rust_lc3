@@ -6,7 +6,7 @@ mod tests;
 
 use std::num::Wrapping;
 
-use super::{registers::ConditionFlag, Lc3Vm, trap_vecs::TrapVector};
+use super::{registers::ConditionFlag, trap_vecs::TrapVector, Lc3Vm};
 use crate::bitwise_utils::sign_extend;
 
 enum OpCode {

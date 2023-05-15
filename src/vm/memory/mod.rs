@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests;
 
-use std::io::{Read, Write, stdin, stdout};
+use std::io::{stdin, stdout, Read, Write};
 
 use ascii::AsciiChar;
 
@@ -113,7 +113,7 @@ impl Memory {
             DeviceRegister::Kbsr => {
                 let mut stdin = stdin().lock();
                 self.read_kbsr(&mut stdin)
-            },
+            }
             DeviceRegister::Kbdr => self.read_kbdr(),
             DeviceRegister::Dsr => self.read_dsr(),
             DeviceRegister::Ddr => self.read_ddr(),
@@ -129,7 +129,7 @@ impl Memory {
     pub fn write(&mut self, address: u16, value: u16) {
         match DeviceRegister::from_address(address) {
             None => self.mem_arr[address as usize].write(value),
-            Some(device_register) => self.write_device_register(device_register, value)
+            Some(device_register) => self.write_device_register(device_register, value),
         }
     }
 
@@ -138,11 +138,11 @@ impl Memory {
             DeviceRegister::Ddr => {
                 let mut stdout = stdout().lock();
                 self.write_ddr(value, &mut stdout);
-            },
+            }
             DeviceRegister::Mcr => self.write_mcr(value),
             // Other registers don't have any specified write behaviour, so nothing
             // will happen in our implementation
-            _ => ()
+            _ => (),
         }
     }
 

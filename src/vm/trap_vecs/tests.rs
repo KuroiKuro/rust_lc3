@@ -1,5 +1,5 @@
 use super::IN_TROUTINE_PROMPT;
-use crate::vm::{registers::RegisterName, Lc3Vm, trap_vecs::HALT_MESSAGE};
+use crate::vm::{registers::RegisterName, trap_vecs::HALT_MESSAGE, Lc3Vm};
 use ascii::AsciiChar;
 use std::str::from_utf8;
 
