@@ -8,8 +8,6 @@ use ascii::AsciiChar;
 /// Maximum size a `u16` can hold
 const MEMORY_MAX: usize = 1 << 16;
 
-const DEVICE_REGISTER_COUNT: usize = 5;
-
 /// Enum representing the memory mapped device registers specified by LC3. Reading
 /// and writing to these registers involved a memory read/write operation to the
 /// specific memory address specified by each of these registers.
@@ -47,16 +45,6 @@ impl DeviceRegister {
             Self::DDR_ADDR => Some(Self::Ddr),
             Self::MCR_ADDR => Some(Self::Mcr),
             _ => None,
-        }
-    }
-
-    pub fn to_address(&self) -> u16 {
-        match self {
-            Self::Kbsr => Self::KBSR_ADDR,
-            Self::Kbdr => Self::KBDR_ADDR,
-            Self::Dsr => Self::DSR_ADDR,
-            Self::Ddr => Self::DDR_ADDR,
-            Self::Mcr => Self::MCR_ADDR,
         }
     }
 }
