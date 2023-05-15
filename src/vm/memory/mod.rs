@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests;
 
-use std::io::{Read, Write};
+use std::io::{Read, Write, stdin, stdout};
 
 use ascii::AsciiChar;
 
@@ -105,14 +105,32 @@ impl Memory {
         }
     }
 
-    /// Reads the value at the given memory address
+    /// Reads the value at the given memory address. If the address corresponds to
+    /// a memory mapped device register, the read action of that specific register
+    /// will be performed
     ///
     /// # Panics
     /// This method will panic if the given address is larger than the memory size
     /// configured in the constant `MEMORY_MAX`
-    pub fn read(&self, address: u16) -> u16 {
-        let address = address as usize;
-        self.mem_arr[address].read()
+    pub fn read(&mut self, address: u16) -> u16 {
+        match DeviceRegister::from_address(address) {
+            None => self.mem_arr[address as usize].read(),
+            Some(device_register) => self.read_device_register(device_register),
+        }
+    }
+
+    /// A handler function that calls the correct function to read the given `DeviceRegister`
+    fn read_device_register(&mut self, device_register: DeviceRegister) -> u16 {
+        match device_register {
+            DeviceRegister::Kbsr => {
+                let mut stdin = stdin().lock();
+                self.read_kbsr(&mut stdin)
+            },
+            DeviceRegister::Kbdr => self.read_kbdr(),
+            DeviceRegister::Dsr => self.read_dsr(),
+            DeviceRegister::Ddr => self.read_ddr(),
+            DeviceRegister::Mcr => self.read_mcr(),
+        }
     }
 
     /// Writes the value at the given memory address
@@ -121,8 +139,23 @@ impl Memory {
     /// This method will panic if the given address is larger than the memory size
     /// configured in the constant `MEMORY_MAX`
     pub fn write(&mut self, address: u16, value: u16) {
-        let address = address as usize;
-        self.mem_arr[address].write(value);
+        match DeviceRegister::from_address(address) {
+            None => self.mem_arr[address as usize].write(value),
+            Some(device_register) => self.write_device_register(device_register, value)
+        }
+    }
+
+    fn write_device_register(&mut self, device_register: DeviceRegister, value: u16) {
+        match device_register {
+            DeviceRegister::Ddr => {
+                let mut stdout = stdout().lock();
+                self.write_ddr(value, &mut stdout);
+            },
+            DeviceRegister::Mcr => self.write_mcr(value),
+            // Other registers don't have any specified write behaviour, so nothing
+            // will happen in our implementation
+            _ => ()
+        }
     }
 
     pub fn mcr_is_cleared(&self) -> bool {
@@ -160,6 +193,13 @@ impl Memory {
     /// simulated version, the display will always be ready so we always return `0x8000`
     fn read_dsr(&self) -> u16 {
         0x8000
+    }
+
+    /// Handles reading of the `DeviceRegister::Ddr` (Display Data Register). The DDR
+    /// is designed for writing, so in this implementation, reading from DDR will always
+    /// return `0`
+    fn read_ddr(&self) -> u16 {
+        0
     }
 
     /// When the program is running, the Machine control register should always return 0x8000,
