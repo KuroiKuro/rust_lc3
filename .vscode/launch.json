@@ -11,11 +11,11 @@
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=rust_vm",
+                    "--bin=lc3",
                     "--package=rust_vm"
                 ],
                 "filter": {
-                    "name": "rust_vm",
+                    "name": "lc3",
                     "kind": "bin"
                 }
             },
