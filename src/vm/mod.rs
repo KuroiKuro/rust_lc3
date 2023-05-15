@@ -5,7 +5,11 @@ mod registers;
 mod tests;
 mod trap_vecs;
 
-use std::{fs::File, io::{Read, self}, path::Path};
+use std::{
+    fs::File,
+    io::{self, Read},
+    path::Path,
+};
 
 use memory::Memory;
 use registers::Registers;
@@ -23,10 +27,7 @@ impl Lc3Vm {
     pub fn new() -> Self {
         let registers = Registers::new();
         let memory = Memory::new();
-        let mut vm = Self {
-            registers,
-            memory,
-        };
+        let mut vm = Self { registers, memory };
         vm.registers.set_program_counter(Self::DEFAULT_PC_START);
         vm
     }

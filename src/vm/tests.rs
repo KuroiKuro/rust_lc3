@@ -18,7 +18,7 @@ fn test_load_program() {
     temp_file.write_all(&write_data).unwrap();
 
     let temp_file_path = temp_file.path();
-    vm.load_program(temp_file_path);
+    vm.load_program(temp_file_path).unwrap();
 
     // Check that 0x3000 is empty, since we configured the start to be another
     // address

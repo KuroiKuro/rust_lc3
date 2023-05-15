@@ -1,7 +1,7 @@
 mod bitwise_utils;
 mod vm;
 
-use std::{env::args, process::exit, path::Path};
+use std::{env::args, path::Path, process::exit};
 
 use vm::Lc3Vm;
 
