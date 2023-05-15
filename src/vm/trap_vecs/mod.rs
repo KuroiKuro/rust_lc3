@@ -6,7 +6,7 @@ use ascii::AsciiChar;
 use std::io::{Read, Write, stdin, stdout};
 
 const IN_TROUTINE_PROMPT: &str = "Enter a character: ";
-const HALT_MESSAGE: &str = "LC3 VM execution halted";
+const HALT_MESSAGE: &str = "LC3 VM execution halted\n";
 
 #[derive(Clone, Copy)]
 pub enum TrapVector {
@@ -44,7 +44,7 @@ impl Lc3Vm {
             TrapVector::Puts => self.puts_troutine(&mut stdout),
             TrapVector::In => self.in_troutine(&mut stdin, &mut stdout),
             TrapVector::Putsp => self.putsp_troutine(&mut stdout),
-            TrapVector::Halt => self.halt_troutine(),
+            TrapVector::Halt => self.halt_troutine(&mut stdout),
         }
     }
 
@@ -156,7 +156,8 @@ impl Lc3Vm {
     }
 
     /// Halt execution and print a message on the console.
-    fn halt_troutine(&mut self) {
+    fn halt_troutine(&mut self, output_writer: &mut impl Write) {
+        write!(output_writer, "{}", HALT_MESSAGE).unwrap();
         self.halt();
     }
 }

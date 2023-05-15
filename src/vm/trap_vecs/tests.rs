@@ -1,5 +1,5 @@
 use super::IN_TROUTINE_PROMPT;
-use crate::vm::{registers::RegisterName, Lc3Vm};
+use crate::vm::{registers::RegisterName, Lc3Vm, trap_vecs::HALT_MESSAGE};
 use ascii::AsciiChar;
 use std::str::from_utf8;
 
@@ -109,7 +109,10 @@ fn test_putsp_troutine() {
 #[test]
 fn test_halt_troutine() {
     let mut vm = Lc3Vm::new();
-    vm.halt_troutine();
+    let mut output: Vec<u8> = Vec::new();
+    vm.halt_troutine(&mut output);
     let running = vm.running();
     assert!(!running);
+    let printed_output = from_utf8(&output).unwrap();
+    assert_eq!(printed_output, HALT_MESSAGE);
 }
