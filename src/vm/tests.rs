@@ -13,7 +13,7 @@ fn test_load_program() {
 
     let write_data = program_data
         .iter()
-        .flat_map(|prog_data_piece| prog_data_piece.to_le_bytes())
+        .flat_map(|prog_data_piece| prog_data_piece.to_be_bytes())
         .collect::<Vec<u8>>();
     temp_file.write_all(&write_data).unwrap();
 
@@ -45,7 +45,7 @@ fn test_load_program() {
 fn test_read_u16() {
     let le_bytes: [u8; 2] = [0x2b, 0x2e];
     let be_u16 = Lc3Vm::read_u16(&le_bytes);
-    assert_eq!(be_u16, 0x2e2b);
+    assert_eq!(be_u16, 0x2b2e);
 }
 
 #[test]
