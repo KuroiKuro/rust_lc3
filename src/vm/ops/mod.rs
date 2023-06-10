@@ -258,7 +258,10 @@ impl Lc3Vm {
 
     /// Performs the `RTI` operation
     fn rti_op(&mut self, _instr: u16) {
-        todo!()
+        // This operation is not actually implemented yet, but it will return so that it is
+        // not blocking programs from running. The RTI operation simply returns control from
+        // a privileged execution (i.e trap routines) to the user level execution
+        ()
     }
 
     /// Performs the `ST` operation
